@@ -360,6 +360,24 @@ export type Database = {
           },
         ]
       }
+      rate_limits: {
+        Row: {
+          count: number
+          key: string
+          window_start: string
+        }
+        Insert: {
+          count?: number
+          key: string
+          window_start?: string
+        }
+        Update: {
+          count?: number
+          key?: string
+          window_start?: string
+        }
+        Relationships: []
+      }
       sales_reps: {
         Row: {
           active: boolean
@@ -475,6 +493,10 @@ export type Database = {
       }
     }
     Functions: {
+      check_rate_limit: {
+        Args: { p_key: string; p_max: number; p_window_seconds: number }
+        Returns: boolean
+      }
       current_partner_id: { Args: never; Returns: string }
       is_june_admin: { Args: never; Returns: boolean }
       is_partner_admin: { Args: never; Returns: boolean }

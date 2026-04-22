@@ -57,16 +57,16 @@ export default function LandingScreen({
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        event_type: 'landing_view',
-        partner_id: partner.id,
-        shop_id: shop?.id ?? null,
-        meta: { locale, slug },
+        eventType: 'landing_view',
+        partnerSlug: slug,
+        shopToken: shop?.qr_token ?? null,
+        meta: { locale },
       }),
       keepalive: true,
     }).catch(() => {
-      // stub; ignore
+      // analytics is fire-and-forget
     });
-  }, [partner.id, shop?.id, locale, slug]);
+  }, [shop?.qr_token, locale, slug]);
 
   const hasReps = reps.length > 0;
   const ctaReady = !hasReps || selectedRepId !== null;
