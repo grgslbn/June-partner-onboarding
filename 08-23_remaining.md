@@ -10,6 +10,8 @@ Format for each: when you expand it, copy the scaffold from Briefing 05 and fill
 
 **Prereq:** 05, 06, 07 · **Effort:** 4h
 
+**Design skills** (see `docs/03_DEV_SETUP.md` §7.1): `interaction-design/state-machine`, `interaction-design/micro-interaction-spec`.
+
 **Goal:** Standard flow (name, email, phone, address with zip→street lookup, language, DOB, gender) works end-to-end.
 
 **Key tasks:**
@@ -27,6 +29,8 @@ Format for each: when you expand it, copy the scaffold from Briefing 05 and fill
 ## 09 — Complete Preset Stepper (Week 3)
 
 **Prereq:** 08 · **Effort:** 6h
+
+**Design skills** (see `docs/03_DEV_SETUP.md` §7.1): `interaction-design/state-machine`, `interaction-design/micro-interaction-spec`, `interaction-design/loading-states`.
 
 **Goal:** Complete flow — collapses June's 9 API steps into 5 visible UI phases.
 
@@ -67,6 +71,8 @@ Format for each: when you expand it, copy the scaffold from Briefing 05 and fill
 
 **Prereq:** 04 · **Effort:** 2h
 
+**Design skills** (see `docs/03_DEV_SETUP.md` §7.1): `design-systems/theming-system`, `design-systems/design-token`, `design-systems/component-spec`. Run `/tokenize` to formalise the partner token set.
+
 **Goal:** Full design-system-level theming — partners can fully brand the experience.
 
 **Key tasks:**
@@ -101,6 +107,8 @@ Format for each: when you expand it, copy the scaffold from Briefing 05 and fill
 
 **Prereq:** 12 · **Effort:** 5h
 
+**Design skills** (see `docs/03_DEV_SETUP.md` §7.1): `design-systems/component-spec`, `design-systems/pattern-library`, `design-systems/naming-convention`, `design-systems/icon-system`. Run `/create-component` per new form pattern.
+
 **Key tasks:**
 - List view at `/admin/partners`: table with slug, name, preset, active toggle. (June admin sees all; partner admin redirected to their own.)
 - Detail view at `/admin/partners/[id]`: tabbed — Branding, Flow, Content, Advanced.
@@ -117,6 +125,8 @@ Format for each: when you expand it, copy the scaffold from Briefing 05 and fill
 ## 14 — Shops + QR Generation (Week 4)
 
 **Prereq:** 13 · **Effort:** 4h
+
+**Design skills** (see `docs/03_DEV_SETUP.md` §7.1): `design-systems/component-spec`, `design-systems/pattern-library`, `design-systems/naming-convention`, `design-systems/icon-system`.
 
 **Key tasks:**
 - `/admin/partners/[id]/shops` — list + create + edit.
@@ -135,6 +145,8 @@ Format for each: when you expand it, copy the scaffold from Briefing 05 and fill
 
 **Prereq:** 14 · **Effort:** 2h
 
+**Design skills** (see `docs/03_DEV_SETUP.md` §7.1): `design-systems/component-spec`, `design-systems/pattern-library`, `design-systems/naming-convention`, `design-systems/icon-system`.
+
 **Key tasks:**
 - Nested under shops: `/admin/partners/[id]/shops/[shopId]/reps`.
 - List + create + edit + soft-disable.
@@ -147,6 +159,8 @@ Format for each: when you expand it, copy the scaffold from Briefing 05 and fill
 ## 16 — Discount Codes (Week 4)
 
 **Prereq:** 13 · **Effort:** 2h
+
+**Design skills** (see `docs/03_DEV_SETUP.md` §7.1): `design-systems/component-spec`, `design-systems/pattern-library`, `design-systems/naming-convention`, `design-systems/icon-system`.
 
 **Key tasks:**
 - `/admin/partners/[id]/discounts` — CRUD.
@@ -161,6 +175,8 @@ Format for each: when you expand it, copy the scaffold from Briefing 05 and fill
 ## 17 — Analytics Views (Week 5)
 
 **Prereq:** 13 · **Effort:** 4h
+
+**Design skills** (see `docs/03_DEV_SETUP.md` §7.1): `ui-design/data-visualization`.
 
 **Key tasks:**
 - `/admin/partners/[id]/analytics` dashboard:
@@ -222,11 +238,13 @@ Format for each: when you expand it, copy the scaffold from Briefing 05 and fill
 
 **Prereq:** all above · **Effort:** 3h
 
+**Design skills** (see `docs/03_DEV_SETUP.md` §7.1): `design-systems/accessibility-audit` is the primary audit framework; `axe-playwright` is the CI automation that enforces it.
+
 **Key tasks:**
 - Run Lighthouse CI on public pages; document results.
 - Measure Core Web Vitals with Vercel Analytics in production.
 - Fix LCP offenders: preload fonts, inline critical CSS, optimise hero image.
-- Run `axe-playwright` on landing + each form preset; fix all violations.
+- Follow `design-systems/accessibility-audit` as the audit framework; automate it with `axe-playwright` on landing + each form preset; fix all violations. Target: zero violations + Lighthouse Accessibility = 100 on every public page.
 - Test with VoiceOver (iOS) and TalkBack (Android) on a real device for the Simple flow.
 - Keyboard-only navigation test: full flow completable without a mouse.
 

@@ -8,7 +8,7 @@
 
 This is the first thing a customer sees after scanning a shop QR. The reference design is the "Version Simple" screenshot in the project brief — partner logo + June logo, red hero, slogan, CTA button. Here it also gets a rep-picker chip.
 
-**Before starting:** read `/mnt/skills/public/frontend-design/SKILL.md`. Follow its guidance on design tokens, component patterns, and avoiding generic AI aesthetics.
+**Design skills** (in `~/.claude/skills/`, see `docs/03_DEV_SETUP.md` §7.1): `ui-design/layout-grid`, `ui-design/visual-hierarchy`, `ui-design/spacing-system`, `ui-design/typography-scale`, `ui-design/color-system`, `design-systems/theming-system`. Run `/design-screen` for the initial pass.
 
 ## Goal
 
@@ -39,7 +39,7 @@ A partner-themed, mobile-first, responsive landing page at `/[locale]/p/[slug]`.
 ## Design references
 
 - Screenshot 1 ("Version Simple") from the brief is your north star for the hero.
-- Use `frontend-design` skill patterns for card, spacing, typography.
+- Apply `ui-design/layout-grid`, `ui-design/spacing-system`, `ui-design/typography-scale` for card, spacing, and typography; `design-systems/theming-system` for the partner-primary CSS-variable pattern.
 - June red `#E53935` is the IHPO primary (from seed data). Don't hardcode — always `var(--primary)`.
 - The June wordmark logo is at `https://raw.githubusercontent.com/grgslbn/June-brand-assets/main/logo/June_logo_white.svg`.
 
