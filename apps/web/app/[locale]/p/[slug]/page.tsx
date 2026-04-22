@@ -1,5 +1,4 @@
 import { notFound } from 'next/navigation';
-import { getTranslations } from 'next-intl/server';
 import { createServiceClient } from '@june/db';
 import { contrastForeground, getPartnerCopy, type Locale } from '@june/shared';
 import LandingScreen from '@/components/public/LandingScreen';
@@ -18,7 +17,7 @@ export default async function PartnerLandingPage({
 
   const { data: partner } = await supabase
     .from('partners')
-    .select('id, slug, name, logo_url, primary_color, accent_color, slogan_i18n, default_locale, locales_enabled, active')
+    .select('id, slug, name, logo_url, primary_color, accent_color, default_locale, locales_enabled, active, tc_url_i18n')
     .eq('slug', slug)
     .maybeSingle();
 
@@ -51,9 +50,8 @@ export default async function PartnerLandingPage({
     reps = (repRows ?? []).map((r) => ({ id: r.id, display_name: r.display_name }));
   }
 
-  const slogan = getPartnerCopy(partner, locale as Locale, 'slogan_i18n');
+  const tcUrl = getPartnerCopy(partner, locale as Locale, 'tc_url_i18n') || null;
   const foreground = contrastForeground(partner.primary_color);
-  const t = await getTranslations({ locale, namespace: 'public.landing' });
 
   return (
     <LandingScreen
@@ -62,23 +60,13 @@ export default async function PartnerLandingPage({
         name: partner.name,
         logoUrl: partner.logo_url,
         primaryColor: partner.primary_color,
-        accentColor: partner.accent_color,
         foregroundColor: foreground,
+        tcUrl,
       }}
       shop={shop}
       reps={reps}
       locale={locale as Locale}
       slug={slug}
-      slogan={slogan}
-      labels={{
-        welcome: t('welcome'),
-        startButton: t('startButton'),
-        repPickerLabel: t('repPickerLabel'),
-        repPickerPlaceholder: t('repPickerPlaceholder'),
-        continueWithoutRep: t('continueWithoutRep'),
-        noEngagement: t('noEngagement'),
-        poweredBy: t('poweredBy'),
-      }}
     />
   );
 }

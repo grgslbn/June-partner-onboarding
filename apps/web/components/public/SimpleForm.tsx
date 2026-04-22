@@ -1,27 +1,22 @@
 'use client';
 
-import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { useRef, useState, type ReactNode } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
-import { Loader2Icon } from 'lucide-react';
+import { ArrowRightIcon, Loader2Icon } from 'lucide-react';
 import {
   simpleLeadSchema,
   type SimpleLeadInput,
   type Locale,
 } from '@june/shared';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Checkbox } from '@/components/ui/checkbox';
+import { BrandCheckbox } from '@/components/public/BrandCheckbox';
 
 type Partner = {
   id: string;
   name: string;
-  primaryColor: string;
-  foregroundColor: '#000000' | '#FFFFFF';
   tcUrl: string | null;
 };
 
@@ -47,6 +42,7 @@ export default function SimpleForm({
   const t = useTranslations('public.form');
   const mountedAt = useRef(Date.now());
   const hpRef = useRef<HTMLInputElement>(null);
+  const startedRef = useRef(false);
   const [submitting, setSubmitting] = useState(false);
 
   const {
@@ -60,11 +56,16 @@ export default function SimpleForm({
     defaultValues: { firstName: '', lastName: '', email: '', tcAccepted: false as unknown as true },
   });
 
-  // form_started fires once per session for this partner+shop combination.
-  useEffect(() => {
+  // form_started fires on first focus of any form field, once per session
+  // (sessionStorage-guarded across refreshes).
+  const handleFormFocus = () => {
+    if (startedRef.current) return;
+    startedRef.current = true;
     const key = `form_started:${partner.id}:${shop?.id ?? 'no-shop'}`;
-    if (typeof sessionStorage !== 'undefined' && sessionStorage.getItem(key)) return;
-    if (typeof sessionStorage !== 'undefined') sessionStorage.setItem(key, '1');
+    if (typeof sessionStorage !== 'undefined') {
+      if (sessionStorage.getItem(key)) return;
+      sessionStorage.setItem(key, '1');
+    }
     fetch('/api/events', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -75,10 +76,8 @@ export default function SimpleForm({
         meta: { locale },
       }),
       keepalive: true,
-    }).catch(() => {
-      // analytics is fire-and-forget
-    });
-  }, [partner.id, shop?.id, shop?.qr_token, locale, slug]);
+    }).catch(() => {});
+  };
 
   const onSubmit = async (data: SimpleLeadInput) => {
     if (Date.now() - mountedAt.current < MIN_FILL_MS) {
@@ -107,8 +106,8 @@ export default function SimpleForm({
         return;
       }
       const body: { confirmationId?: string } = await res.json().catch(() => ({}));
-      const ref = body.confirmationId ?? '';
-      router.push(`/${locale}/p/${slug}/done?ref=${encodeURIComponent(ref)}`);
+      const confirmationId = body.confirmationId ?? '';
+      router.push(`/${locale}/p/${slug}/done?ref=${encodeURIComponent(confirmationId)}`);
     } catch {
       toast.error(t('submitError.network'));
     } finally {
@@ -116,25 +115,39 @@ export default function SimpleForm({
     }
   };
 
+  // Link text is partner-themed, but `var(--partner-primary)` on white fails
+  // WCAG AA 4.5:1 for every primary we're likely to see at normal size (red
+  // #E53935 is 4.22:1). Derive a darker variant via color-mix so the tint
+  // reads partner-branded while staying accessible on white.
+  const linkStyle: React.CSSProperties = {
+    color: 'color-mix(in oklch, var(--partner-primary) 70%, black)',
+  };
   const tcLink = (chunks: ReactNode) =>
     partner.tcUrl ? (
       <a
         href={partner.tcUrl}
         target="_blank"
         rel="noopener noreferrer"
-        className="underline underline-offset-2"
+        style={linkStyle}
+        className="font-medium underline underline-offset-2"
       >
         {chunks}
       </a>
     ) : (
-      <span className="underline underline-offset-2">{chunks}</span>
+      <span style={linkStyle} className="font-medium underline underline-offset-2">
+        {chunks}
+      </span>
     );
+
+  const inputClass =
+    'h-12 w-full rounded-lg border border-neutral-200 bg-white px-4 text-base text-neutral-900 placeholder:text-neutral-400 outline-none transition-colors focus:border-[var(--partner-primary)] not-placeholder-shown:border-[var(--partner-primary)] aria-[invalid=true]:border-red-500';
 
   return (
     <form
       noValidate
       onSubmit={handleSubmit(onSubmit)}
-      className="flex flex-col gap-6"
+      onFocus={handleFormFocus}
+      className="flex flex-col gap-5"
     >
       <input
         ref={hpRef}
@@ -147,34 +160,36 @@ export default function SimpleForm({
       />
 
       <div className="flex flex-col gap-2">
-        <Label htmlFor="firstName">{t('firstName')}</Label>
-        <Input
+        <label htmlFor="firstName" className="text-sm font-medium text-neutral-700">
+          {t('firstName')}
+        </label>
+        <input
           id="firstName"
           autoComplete="given-name"
+          placeholder={t('placeholderFirstName')}
           aria-invalid={!!errors.firstName}
           aria-describedby={errors.firstName ? 'firstName-error' : undefined}
-          className="h-12"
+          className={inputClass}
           {...register('firstName')}
         />
         {errors.firstName && (
-          <p
-            id="firstName-error"
-            role="alert"
-            className="text-sm text-red-600"
-          >
+          <p id="firstName-error" role="alert" className="text-sm text-red-600">
             {t('validation.required')}
           </p>
         )}
       </div>
 
       <div className="flex flex-col gap-2">
-        <Label htmlFor="lastName">{t('lastName')}</Label>
-        <Input
+        <label htmlFor="lastName" className="text-sm font-medium text-neutral-700">
+          {t('lastName')}
+        </label>
+        <input
           id="lastName"
           autoComplete="family-name"
+          placeholder={t('placeholderLastName')}
           aria-invalid={!!errors.lastName}
           aria-describedby={errors.lastName ? 'lastName-error' : undefined}
-          className="h-12"
+          className={inputClass}
           {...register('lastName')}
         />
         {errors.lastName && (
@@ -185,15 +200,18 @@ export default function SimpleForm({
       </div>
 
       <div className="flex flex-col gap-2">
-        <Label htmlFor="email">{t('email')}</Label>
-        <Input
+        <label htmlFor="email" className="text-sm font-medium text-neutral-700">
+          {t('email')}
+        </label>
+        <input
           id="email"
           type="email"
           inputMode="email"
           autoComplete="email"
+          placeholder={t('placeholderEmail')}
           aria-invalid={!!errors.email}
           aria-describedby={errors.email ? 'email-error' : undefined}
-          className="h-12"
+          className={inputClass}
           {...register('email')}
         />
         {errors.email && (
@@ -207,40 +225,41 @@ export default function SimpleForm({
         control={control}
         name="tcAccepted"
         render={({ field }) => (
-          <Label
+          <label
             htmlFor="tcAccepted"
-            className="flex cursor-pointer items-start gap-3 text-sm font-normal leading-snug text-neutral-700"
+            className="mt-1 flex cursor-pointer items-start gap-3 text-sm font-normal leading-snug text-neutral-700"
           >
-            <Checkbox
+            <BrandCheckbox
               id="tcAccepted"
               checked={field.value === true}
               onCheckedChange={(v) => field.onChange(v === true)}
               className="mt-0.5"
               aria-required="true"
             />
-            <span>{t.rich('tcAccept', { link: tcLink })}</span>
-          </Label>
+            <span>
+              {t.rich('tcAccept', { link: tcLink, partnerName: partner.name })}
+            </span>
+          </label>
         )}
       />
 
-      <Button
+      <button
         type="submit"
         disabled={!isValid || submitting}
-        className="h-14 w-full text-base font-medium disabled:opacity-60"
-        style={{
-          backgroundColor: partner.primaryColor,
-          color: partner.foregroundColor,
-        }}
+        className="mt-2 inline-flex h-14 w-full items-center justify-center gap-2 rounded-lg bg-neutral-900 text-base font-medium text-white outline-none transition-colors hover:bg-neutral-800 focus-visible:ring-2 focus-visible:ring-neutral-900 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:bg-neutral-200 disabled:text-neutral-400"
       >
         {submitting ? (
-          <span className="inline-flex items-center gap-2">
+          <>
             <Loader2Icon className="size-5 animate-spin" aria-hidden="true" />
-            {t('submitting')}
-          </span>
+            <span>{t('submitting')}</span>
+          </>
         ) : (
-          t('submitButton')
+          <>
+            <span>{t('submitButton')}</span>
+            <ArrowRightIcon className="size-5" aria-hidden="true" />
+          </>
         )}
-      </Button>
+      </button>
     </form>
   );
 }
