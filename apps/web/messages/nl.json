@@ -3,7 +3,12 @@
     "landing": {
       "welcome": "Welkom",
       "selectRep": "Selecteer uw verkoper",
-      "startButton": "Start inschrijving"
+      "startButton": "Start inschrijving",
+      "repPickerLabel": "Wie helpt u vandaag?",
+      "repPickerPlaceholder": "Kies een verkoper",
+      "continueWithoutRep": "Verder zonder verkoper",
+      "noEngagement": "Zonder verplichtingen · op elk moment opzegbaar",
+      "poweredBy": "Aangeboden door"
     },
     "form": {
       "firstName": "Voornaam",

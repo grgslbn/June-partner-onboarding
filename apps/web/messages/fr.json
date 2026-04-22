@@ -3,7 +3,12 @@
     "landing": {
       "welcome": "Bienvenue",
       "selectRep": "Sélectionnez votre conseiller",
-      "startButton": "Commencer l'inscription"
+      "startButton": "Commencer l'inscription",
+      "repPickerLabel": "Qui vous aide aujourd'hui ?",
+      "repPickerPlaceholder": "Choisissez un conseiller",
+      "continueWithoutRep": "Continuer sans conseiller",
+      "noEngagement": "Sans engagement · Résiliable à tout moment",
+      "poweredBy": "Propulsé par"
     },
     "form": {
       "firstName": "Prénom",
