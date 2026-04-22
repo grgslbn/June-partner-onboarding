@@ -89,7 +89,7 @@ export default function LandingScreen({
   } as React.CSSProperties;
 
   return (
-    <div style={heroStyle} className="mx-auto flex min-h-screen max-w-[420px] flex-col">
+    <main style={heroStyle} className="mx-auto flex min-h-screen max-w-[420px] flex-col">
       <header
         className="flex flex-1 flex-col items-center justify-center px-6 pt-16 pb-12 text-center"
         style={{
@@ -97,44 +97,22 @@ export default function LandingScreen({
           color: 'var(--partner-fg)',
         }}
       >
-        <div className="flex flex-col items-center gap-6">
-          {partner.logoUrl ? (
-            <img
-              src={partner.logoUrl}
-              alt={partner.name}
-              className="max-h-16 w-auto"
-            />
-          ) : (
-            <div className="text-3xl font-semibold tracking-tight">{partner.name}</div>
-          )}
-
-          <div
-            className="flex items-center gap-2 text-sm"
-            style={{ color: 'var(--partner-fg-muted)' }}
-          >
-            <span>{labels.poweredBy}</span>
-            <img
-              src="https://raw.githubusercontent.com/grgslbn/June-brand-assets/main/logo/June_logo_white.svg"
-              alt="June"
-              className="h-4 w-auto"
-              style={{
-                filter: partner.foregroundColor === '#000000' ? 'invert(1)' : 'none',
-              }}
-            />
-          </div>
-        </div>
+        {partner.logoUrl ? (
+          <img
+            src={partner.logoUrl}
+            alt={partner.name}
+            className="max-h-16 w-auto"
+          />
+        ) : (
+          <div className="text-3xl font-semibold tracking-tight">{partner.name}</div>
+        )}
 
         <h1 className="mt-12 text-4xl font-semibold leading-tight tracking-tight">
           {labels.welcome}
         </h1>
 
         {slogan && (
-          <p
-            className="mt-4 max-w-[22ch] text-lg leading-snug"
-            style={{ color: 'var(--partner-fg-muted)' }}
-          >
-            {slogan}
-          </p>
+          <p className="mt-4 max-w-[22ch] text-lg leading-snug">{slogan}</p>
         )}
       </header>
 
@@ -184,7 +162,17 @@ export default function LandingScreen({
         </Button>
 
         <p className="text-center text-xs text-neutral-500">{labels.noEngagement}</p>
+
+        <div className="flex items-center justify-center gap-2 text-xs text-neutral-500">
+          <span>{labels.poweredBy}</span>
+          <img
+            src="https://raw.githubusercontent.com/grgslbn/June-brand-assets/main/logo/June_logo_white.svg"
+            alt="June"
+            className="h-3 w-auto"
+            style={{ filter: 'invert(1)' }}
+          />
+        </div>
       </section>
-    </div>
+    </main>
   );
 }
