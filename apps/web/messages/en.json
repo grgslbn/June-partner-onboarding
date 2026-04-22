@@ -3,7 +3,12 @@
     "landing": {
       "welcome": "Welcome",
       "selectRep": "Choose your sales advisor",
-      "startButton": "Start onboarding"
+      "startButton": "Start onboarding",
+      "repPickerLabel": "Who's helping you today?",
+      "repPickerPlaceholder": "Pick an advisor",
+      "continueWithoutRep": "Continue without an advisor",
+      "noEngagement": "No commitment · cancel anytime",
+      "poweredBy": "Powered by"
     },
     "form": {
       "firstName": "First name",
