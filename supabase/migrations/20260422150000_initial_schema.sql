@@ -41,7 +41,7 @@ create table shops (
   address text,
   city text,
   zip text,
-  qr_token text unique not null default encode(gen_random_bytes(9), 'base64'),
+  qr_token text unique not null default encode(extensions.gen_random_bytes(9), 'base64'),
   active boolean not null default true,
   created_at timestamptz default now()
 );
