@@ -91,7 +91,7 @@ export default function LandingScreen({
   return (
     <main style={heroStyle} className="mx-auto flex min-h-screen max-w-[420px] flex-col">
       <header
-        className="flex flex-1 flex-col items-center justify-center px-6 pt-16 pb-12 text-center"
+        className="flex flex-1 flex-col items-center justify-center px-6 pt-20 pb-16 text-center"
         style={{
           backgroundColor: 'var(--partner-primary)',
           color: 'var(--partner-fg)',
@@ -101,13 +101,13 @@ export default function LandingScreen({
           <img
             src={partner.logoUrl}
             alt={partner.name}
-            className="max-h-16 w-auto"
+            className="max-h-20 w-auto"
           />
         ) : (
           <div className="text-3xl font-semibold tracking-tight">{partner.name}</div>
         )}
 
-        <h1 className="mt-12 text-4xl font-semibold leading-tight tracking-tight">
+        <h1 className="mt-16 text-4xl font-semibold leading-tight tracking-tight md:text-5xl">
           {labels.welcome}
         </h1>
 
@@ -116,7 +116,7 @@ export default function LandingScreen({
         )}
       </header>
 
-      <section className="flex flex-col gap-6 bg-white px-6 pt-8 pb-10 text-neutral-900">
+      <section className="flex flex-col gap-6 bg-white px-6 pt-12 pb-12 text-neutral-900">
         {shop && (
           <div className="flex flex-col gap-2">
             <label
