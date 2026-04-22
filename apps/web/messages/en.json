@@ -1,0 +1,36 @@
+{
+  "public": {
+    "landing": {
+      "welcome": "Welcome",
+      "selectRep": "Choose your sales advisor",
+      "startButton": "Start onboarding"
+    },
+    "form": {
+      "firstName": "First name",
+      "lastName": "Last name",
+      "email": "Email address",
+      "phone": "Phone number",
+      "tcAccept": "I accept the terms and conditions",
+      "submitButton": "Submit",
+      "validation": {
+        "required": "This field is required",
+        "email": "Please enter a valid email address"
+      }
+    },
+    "success": {
+      "title": "Thank you!",
+      "message": "Your registration has been received.",
+      "checkEmail": "We've sent you a confirmation email."
+    }
+  },
+  "cms": {
+    "nav": {
+      "partners": "Partners",
+      "shops": "Shops",
+      "reps": "Sales reps",
+      "leads": "Leads",
+      "analytics": "Analytics",
+      "settings": "Settings"
+    }
+  }
+}

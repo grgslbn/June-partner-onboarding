@@ -1,7 +1,7 @@
 import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { config as loadEnv } from 'dotenv';
-import type { Database } from '../types.js';
+import type { Database } from '../types';
 
 loadEnv({ path: '.env.test' });
 
