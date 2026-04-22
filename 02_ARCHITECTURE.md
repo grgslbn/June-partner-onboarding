@@ -235,38 +235,72 @@ create index on events(event_type, created_at desc);
 
 ### 3.2 Row-Level Security
 
-Every partner-scoped table has RLS on. The canonical policy pattern:
+Every partner-scoped table has RLS on. Role and partner-id lookups go through three `SECURITY DEFINER` helper functions so policies never query `profiles` inline — Postgres rejects that as infinite recursion (42P17) once `profiles` itself has RLS, and even when it doesn't recurse, inline `exists (select 1 from profiles ...)` runs per-row and slows every policy check.
+
+```sql
+create or replace function public.is_june_admin() returns boolean
+  language sql stable security definer
+  set search_path = public
+  as $$
+    select exists (
+      select 1 from public.profiles
+      where id = auth.uid() and role = 'june_admin'
+    );
+  $$;
+
+create or replace function public.is_partner_admin() returns boolean
+  language sql stable security definer
+  set search_path = public
+  as $$
+    select exists (
+      select 1 from public.profiles
+      where id = auth.uid() and role = 'partner_admin'
+    );
+  $$;
+
+create or replace function public.current_partner_id() returns uuid
+  language sql stable security definer
+  set search_path = public
+  as $$
+    select partner_id from public.profiles where id = auth.uid();
+  $$;
+
+revoke execute on function public.is_june_admin() from public;
+revoke execute on function public.is_partner_admin() from public;
+revoke execute on function public.current_partner_id() from public;
+
+grant execute on function public.is_june_admin() to authenticated;
+grant execute on function public.is_partner_admin() to authenticated;
+grant execute on function public.current_partner_id() to authenticated;
+```
+
+Canonical policy pattern, shown on `leads`:
 
 ```sql
 alter table leads enable row level security;
 
--- June admins see everything
 create policy "june_admin_all_leads" on leads
-  for all
-  using (
-    exists (
-      select 1 from profiles
-      where profiles.id = auth.uid()
-        and profiles.role = 'june_admin'
-    )
-  );
+  for all to authenticated
+  using (public.is_june_admin());
 
--- Partner admins see only their partner's leads
 create policy "partner_admin_own_leads" on leads
-  for all
+  for all to authenticated
   using (
-    exists (
-      select 1 from profiles
-      where profiles.id = auth.uid()
-        and profiles.role = 'partner_admin'
-        and profiles.partner_id = leads.partner_id
-    )
+    public.is_partner_admin()
+    and public.current_partner_id() = leads.partner_id
   );
 ```
 
-Same pattern for `shops`, `sales_reps`, `discount_codes`, `events`, `partners`.
+Same pattern for `shops`, `sales_reps` (scoped via `shops.partner_id`), `discount_codes`, `events`, `partners`. **`profiles` is the exception** — its policies stay inline (`auth.uid() = id`) because the helpers query `profiles` internally; calling them from `profiles`' own policies would require case-by-case recursion analysis. Inline keeps `profiles` easy to audit. June admins manage other users' profile rows via the `service_role` key, server-side.
 
-The **public** lead submit endpoint uses the Supabase `service_role` key **server-side only** (in a Next.js route handler), bypassing RLS deliberately. The route handler does its own validation (partner slug + shop token match a real partner + shop).
+**Review checklist when adding a new RLS helper:**
+- `language sql stable security definer`; no PL/pgSQL, no `volatile`.
+- Read-only — no `insert`, `update`, `delete`, mutating side effects.
+- No dynamic SQL (`execute`); no user-controlled parameters that shape query structure.
+- `set search_path = public` so resolution is pinned.
+- `revoke execute from public` then `grant execute to authenticated` — no other grants (definitely not `anon`).
+
+The **public** lead submit endpoint uses the Supabase `service_role` key **server-side only** (in a Next.js route handler), bypassing RLS deliberately. The route handler does its own validation (partner slug + shop token match a real partner + shop). For the anon client in the browser, a narrow `for insert to anon with check (true)` policy plus `grant insert` is the only write path on `leads` and `events`; there is no `to anon` read policy anywhere.
 
 ### 3.3 Analytics views
 
