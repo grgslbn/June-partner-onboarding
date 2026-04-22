@@ -12,8 +12,7 @@ Install these first (macOS / Linux; Windows via WSL2):
 |---|---|---|
 | Node.js | 20 LTS or later | [nodejs.org](https://nodejs.org) or `nvm install 20` |
 | pnpm | 9+ | `npm i -g pnpm` |
-| Docker Desktop | latest | Needed for local Supabase |
-| Supabase CLI | 1.x | `brew install supabase/tap/supabase` |
+| Supabase CLI | 1.x+ | `brew install supabase/tap/supabase` (used for migrations + type generation only — no local containers) |
 | Git | 2.40+ | `brew install git` |
 | Claude Code | latest | See [product-self-knowledge installation](https://docs.claude.com) |
 | Railway CLI (optional local) | latest | `brew install railway` |
@@ -106,25 +105,38 @@ pnpm add -D @types/node vitest @vitest/ui @playwright/test @axe-core/playwright
 
 ---
 
-## 3. Set up local Supabase
+## 3. Set up a Supabase cloud dev project
+
+> **⚠️ Never run `supabase db reset` against a linked cloud project** — it wipes the project. Use `supabase db push` to apply new migrations, and the Supabase Studio dashboard for ad-hoc inspection.
+
+### 3.1 Create the project
+
+1. Sign in at [supabase.com](https://supabase.com).
+2. Create a new project named `june-onboarding-dev` in an EU region (`eu-central-1` or `eu-west`).
+3. Wait for provisioning (~1–2 min).
+4. From **Project Settings → API**, copy:
+   - Project URL
+   - `anon` public key
+   - `service_role` secret key
+5. From **Project Settings → General**, note the project's **Reference ID** (short string like `abcxyz123`).
+
+### 3.2 Install and link the Supabase CLI
+
+The CLI is still required — for applying migrations and generating TypeScript types. It does **not** run a local stack.
 
 ```bash
-cd ../../  # back to repo root
-supabase init
-supabase start
+supabase login
+supabase init                         # from repo root — scaffolds supabase/ directory
+supabase link --project-ref <ref>     # ref from step 3.1.5
 ```
 
-This spins up local Postgres + GoTrue + Storage on your machine. It prints:
-- API URL (usually `http://localhost:54321`)
-- anon key
-- service role key
-- Studio URL (usually `http://localhost:54323`)
+### 3.3 Save credentials to `.env.local`
 
-Save those into `apps/web/.env.local`:
+Paste the values from step 3.1.4 into `apps/web/.env.local`:
 
 ```ini
-NEXT_PUBLIC_SUPABASE_URL=http://localhost:54321
-NEXT_PUBLIC_SUPABASE_ANON_KEY=<anon key from supabase start>
+NEXT_PUBLIC_SUPABASE_URL=<project URL>
+NEXT_PUBLIC_SUPABASE_ANON_KEY=<anon key>
 SUPABASE_SERVICE_ROLE_KEY=<service role key>
 
 RESEND_API_KEY=re_dev_xxx  # use a test key from resend.com
@@ -135,24 +147,33 @@ SENTRY_DSN=<your dev sentry dsn or blank>
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
 ```
 
-Create the initial migration:
+### 3.4 Apply the initial migration
 
 ```bash
 supabase migration new initial_schema
 ```
 
-Paste the schema from `docs/02_ARCHITECTURE.md` section 3.1 into `supabase/migrations/<timestamp>_initial_schema.sql`, then apply:
+Paste the schema from `docs/02_ARCHITECTURE.md` section 3.1 into `supabase/migrations/<timestamp>_initial_schema.sql`, then push it to the linked cloud project:
 
 ```bash
-supabase db reset  # wipes and re-applies all migrations
+supabase db push
 ```
 
-Generate TypeScript types:
+### 3.5 Generate TypeScript types
+
+Types come from the linked cloud project:
 
 ```bash
 mkdir -p packages/db/src
-supabase gen types typescript --local > packages/db/src/types.ts
+supabase gen types typescript --linked > packages/db/src/types.ts
 ```
+
+### 3.6 Why cloud dev instead of a local Supabase stack?
+
+- Simpler laptop setup — no Docker, no local containers.
+- The dev environment matches production exactly: same Postgres version, same RLS engine, same Auth behaviour.
+- Downside: you need an internet connection to develop, and schema changes take a cloud round-trip instead of an instant local reset.
+- Mitigation: keep migrations small and focused; use Supabase Studio's SQL editor for exploratory queries rather than re-pushing schema churn.
 
 ---
 
@@ -196,7 +217,15 @@ values (
 );
 ```
 
-Run it: `supabase db reset` re-applies migrations + seed.
+Apply the seed once, manually:
+
+- **Option A (easiest):** Open Supabase Studio for your `june-onboarding-dev` project → **SQL Editor** → paste the contents of `supabase/seed.sql` → **Run**.
+- **Option B (CLI):** Copy the connection string from **Project Settings → Database** and pipe the seed through `psql`:
+  ```bash
+  psql "postgres://postgres:<password>@<project-host>:5432/postgres" -f supabase/seed.sql
+  ```
+
+Do **not** rely on `supabase db reset` — that would wipe the cloud project.
 
 ---
 
@@ -207,21 +236,16 @@ cd apps/worker
 pnpm init
 pnpm add @supabase/supabase-js resend croner pino
 pnpm add -D typescript tsx @types/node
-
-# Minimal Dockerfile for Railway
 ```
 
-Create `apps/worker/Dockerfile`:
-
-```dockerfile
-FROM node:20-alpine
-WORKDIR /app
-COPY package.json pnpm-lock.yaml ./
-RUN npm i -g pnpm && pnpm install --frozen-lockfile
-COPY . .
-RUN pnpm build
-CMD ["node", "dist/index.js"]
-```
+> **No Dockerfile.** Railway auto-detects the Node app via Nixpacks and builds it from `package.json`. Make sure the worker's `package.json` has:
+>
+> ```json
+> "scripts": {
+>   "build": "tsc",
+>   "start": "node dist/index.js"
+> }
+> ```
 
 Create `apps/worker/src/index.ts`:
 
@@ -310,7 +334,7 @@ cd apps/worker
 railway login
 railway init
 railway link
-# Railway auto-detects Dockerfile. Set env vars via the dashboard.
+# Railway auto-detects the Node app via Nixpacks (uses package.json build + start scripts). Set env vars via the dashboard.
 railway up
 ```
 
@@ -371,7 +395,7 @@ Your brief mentions Antigravity. Workflow:
 
 | Symptom | Fix |
 |---|---|
-| `supabase start` fails with port conflict | `supabase stop && supabase start` — or pick custom ports in `supabase/config.toml` |
+| `supabase db push` fails with "project not linked" | Run `supabase link --project-ref <ref>` first. The ref is in your Supabase dashboard under Project Settings → General. |
 | Next.js can't find `@/components/ui/*` | shadcn wasn't initialised. Run `pnpm dlx shadcn@latest init` |
 | Resend emails bounce | Using unverified domain in prod. Add DKIM records and verify in Resend dashboard. |
 | RLS blocks everything in dev | You're querying as anon, not a logged-in admin. Either log in or use service role client server-side. |

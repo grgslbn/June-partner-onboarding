@@ -46,15 +46,14 @@ june-partner-onboarding/
 │   │   ├── messages/           # next-intl JSON: nl.json, fr.json, en.json
 │   │   └── emails/             # React Email templates
 │   │
-│   └── worker/                 # Railway background worker
-│       ├── src/
-│       │   ├── jobs/
-│       │   │   ├── daily-digest.ts
-│       │   │   ├── email-retry.ts
-│       │   │   └── phase3-june-sync.ts   # Stubbed for now
-│       │   ├── lib/
-│       │   └── index.ts        # cron scheduler entry
-│       └── Dockerfile
+│   └── worker/                 # Railway background worker (Nixpacks auto-detect — no Dockerfile)
+│       └── src/
+│           ├── jobs/
+│           │   ├── daily-digest.ts
+│           │   ├── email-retry.ts
+│           │   └── phase3-june-sync.ts   # Stubbed for now
+│           ├── lib/
+│           └── index.ts        # cron scheduler entry
 │
 ├── packages/
 │   ├── db/                     # Shared DB types + Supabase client factory
@@ -357,7 +356,7 @@ Customer browser                Next.js API route             Supabase          
            │ Read/write via service role
            │
 ┌──────────┴──────────────────────────────────────────────┐
-│ Railway worker (Node, Docker)                           │
+│ Railway worker (Node, Nixpacks-built)                   │
 │  ├─ Cron: daily-digest (06:00 Europe/Brussels)          │
 │  ├─ Cron: ip-pruner (daily)                             │
 │  ├─ Queue: email-retry (every 5 min)                    │
@@ -377,7 +376,7 @@ Customer browser                Next.js API route             Supabase          
 | `JUNE_API_CLIENT_ID` / `SECRET` | Railway env (worker only, Phase 3) | June API auth |
 | `SENTRY_DSN` | Both | Error reporting |
 
-Vercel: use **Environment Variables** split by Production / Preview / Development. Supabase service role is Production + Preview only; Development uses local Supabase (via `supabase start`).
+Vercel: use **Environment Variables** split by Production / Preview / Development. Supabase service role is Production + Preview only; Development points at a dedicated Supabase cloud dev project (`june-onboarding-dev`) — see `docs/03_DEV_SETUP.md` §3.
 
 ### 6.2 Public endpoint hardening
 

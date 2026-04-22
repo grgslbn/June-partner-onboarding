@@ -18,7 +18,14 @@ A working monorepo where `pnpm dev --filter=web` renders a Next.js page at `http
 
 1. Initialise Turborepo + pnpm workspaces following the exact layout in `02_ARCHITECTURE.md` §2.
 2. Create `apps/web` with Next.js 15, App Router, TypeScript, Tailwind v4, import alias `@/*`.
-3. Create `apps/worker` stub with `package.json` and a `src/index.ts` that just logs "Worker started."
+3. Create `apps/worker` stub with `package.json` and a `src/index.ts` that just logs "Worker started." The `package.json` must include:
+   ```json
+   "scripts": {
+     "build": "tsc",
+     "start": "node dist/index.js"
+   }
+   ```
+   Railway's Nixpacks build uses these. **Do NOT create a Dockerfile** — there is no Docker in this project.
 4. Create `packages/shared`, `packages/db`, `packages/june-api` as empty packages with `package.json` and `src/index.ts` exporting nothing.
 5. Install root dev deps: `turbo`, `typescript`, `prettier`, `eslint`.
 6. Create a root `README.md` pointing at `docs/01_PRD.md` and `docs/03_DEV_SETUP.md`.
