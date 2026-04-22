@@ -1,0 +1,26 @@
+{
+  "name": "worker",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx watch src/index.ts",
+    "start": "node dist/index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.33.1",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.104.0",
+    "croner": "^10.0.1",
+    "pino": "^10.3.1",
+    "resend": "^6.12.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.39",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
+  }
+}

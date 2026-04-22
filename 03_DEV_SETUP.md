@@ -1,0 +1,385 @@
+# Dev Setup — June Partner Onboarding
+
+From zero to running locally in ~30 minutes. Follow in order.
+
+---
+
+## 0. Prerequisites
+
+Install these first (macOS / Linux; Windows via WSL2):
+
+| Tool | Version | Install |
+|---|---|---|
+| Node.js | 20 LTS or later | [nodejs.org](https://nodejs.org) or `nvm install 20` |
+| pnpm | 9+ | `npm i -g pnpm` |
+| Docker Desktop | latest | Needed for local Supabase |
+| Supabase CLI | 1.x | `brew install supabase/tap/supabase` |
+| Git | 2.40+ | `brew install git` |
+| Claude Code | latest | See [product-self-knowledge installation](https://docs.claude.com) |
+| Railway CLI (optional local) | latest | `brew install railway` |
+| GitHub CLI (optional) | latest | `brew install gh` |
+
+Accounts you'll need:
+- GitHub (org or personal)
+- Vercel (free tier fine for dev)
+- Supabase (free tier fine for dev)
+- Railway (free trial → Hobby plan $5/mo for production)
+- Resend (free tier 100 emails/day — plenty for dev)
+- Sentry (free tier)
+- Cloudflare (optional, for custom domain + Turnstile later)
+
+---
+
+## 1. Create the repo
+
+```bash
+# Create a new directory and init
+mkdir june-partner-onboarding && cd june-partner-onboarding
+git init
+gh repo create june-partner-onboarding --private --source=. --push  # or do this later
+
+# Scaffold via pnpm
+pnpm init
+```
+
+Set up the Turborepo monorepo:
+
+```bash
+# Install Turbo
+pnpm add -D turbo -w
+
+# Create workspace structure
+mkdir -p apps/web apps/worker packages/shared packages/db packages/june-api supabase docs briefings
+```
+
+Create `pnpm-workspace.yaml`:
+```yaml
+packages:
+  - "apps/*"
+  - "packages/*"
+```
+
+Create `turbo.json`:
+```json
+{
+  "$schema": "https://turbo.build/schema.json",
+  "tasks": {
+    "build": { "dependsOn": ["^build"], "outputs": [".next/**", "dist/**"] },
+    "dev": { "cache": false, "persistent": true },
+    "lint": {},
+    "test": {},
+    "typecheck": { "dependsOn": ["^build"] }
+  }
+}
+```
+
+---
+
+## 2. Scaffold the Next.js app
+
+```bash
+cd apps
+pnpm create next-app@latest web --typescript --tailwind --app --src-dir=false --import-alias="@/*"
+cd web
+
+# Add core libs
+pnpm add @supabase/ssr @supabase/supabase-js
+pnpm add react-hook-form zod @hookform/resolvers
+pnpm add next-intl
+pnpm add @sentry/nextjs
+pnpm add lucide-react recharts
+pnpm add resend react-email @react-email/components
+
+# Add shadcn/ui
+pnpm dlx shadcn@latest init
+pnpm dlx shadcn@latest add button input label card form toast dialog select checkbox
+
+# Dev deps
+pnpm add -D @types/node vitest @vitest/ui @playwright/test @axe-core/playwright
+```
+
+**Install the shadcn skill so Claude Code can manage components cleanly:**
+```bash
+# From https://ui.shadcn.com/docs/skills
+# Follow the project's own instructions at that URL
+```
+
+---
+
+## 3. Set up local Supabase
+
+```bash
+cd ../../  # back to repo root
+supabase init
+supabase start
+```
+
+This spins up local Postgres + GoTrue + Storage on your machine. It prints:
+- API URL (usually `http://localhost:54321`)
+- anon key
+- service role key
+- Studio URL (usually `http://localhost:54323`)
+
+Save those into `apps/web/.env.local`:
+
+```ini
+NEXT_PUBLIC_SUPABASE_URL=http://localhost:54321
+NEXT_PUBLIC_SUPABASE_ANON_KEY=<anon key from supabase start>
+SUPABASE_SERVICE_ROLE_KEY=<service role key>
+
+RESEND_API_KEY=re_dev_xxx  # use a test key from resend.com
+RESEND_FROM_EMAIL=onboarding@onboard.june.energy  # unverified at first, use resend.dev domain for dev
+
+SENTRY_DSN=<your dev sentry dsn or blank>
+
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
+```
+
+Create the initial migration:
+
+```bash
+supabase migration new initial_schema
+```
+
+Paste the schema from `docs/02_ARCHITECTURE.md` section 3.1 into `supabase/migrations/<timestamp>_initial_schema.sql`, then apply:
+
+```bash
+supabase db reset  # wipes and re-applies all migrations
+```
+
+Generate TypeScript types:
+
+```bash
+mkdir -p packages/db/src
+supabase gen types typescript --local > packages/db/src/types.ts
+```
+
+---
+
+## 4. Seed dev data
+
+Create `supabase/seed.sql`:
+
+```sql
+-- Demo partner: IHPO
+insert into partners (id, slug, name, primary_color, accent_color, flow_preset, iban_behavior, locales_enabled, default_locale)
+values (
+  '00000000-0000-0000-0000-000000000001',
+  'ihpo',
+  'IHPO',
+  '#E53935',
+  '#FFFFFF',
+  'simple',
+  'deferred',
+  array['nl','fr'],
+  'fr'
+);
+
+-- Demo shop
+insert into shops (id, partner_id, name, address, city, zip, qr_token)
+values (
+  '00000000-0000-0000-0000-000000000010',
+  '00000000-0000-0000-0000-000000000001',
+  'IHPO Brussels Central',
+  'Rue Royale 1',
+  'Brussels',
+  '1000',
+  'demo-shop-qr'
+);
+
+-- Demo rep
+insert into sales_reps (shop_id, display_name, email)
+values (
+  '00000000-0000-0000-0000-000000000010',
+  'Marie Dupont',
+  'marie@ihpo.example'
+);
+```
+
+Run it: `supabase db reset` re-applies migrations + seed.
+
+---
+
+## 5. Wire up the worker
+
+```bash
+cd apps/worker
+pnpm init
+pnpm add @supabase/supabase-js resend croner pino
+pnpm add -D typescript tsx @types/node
+
+# Minimal Dockerfile for Railway
+```
+
+Create `apps/worker/Dockerfile`:
+
+```dockerfile
+FROM node:20-alpine
+WORKDIR /app
+COPY package.json pnpm-lock.yaml ./
+RUN npm i -g pnpm && pnpm install --frozen-lockfile
+COPY . .
+RUN pnpm build
+CMD ["node", "dist/index.js"]
+```
+
+Create `apps/worker/src/index.ts`:
+
+```ts
+import { Cron } from 'croner';
+import { runDailyDigest } from './jobs/daily-digest';
+import { runEmailRetry } from './jobs/email-retry';
+
+// Daily digest at 06:00 Brussels
+new Cron('0 6 * * *', { timezone: 'Europe/Brussels' }, async () => {
+  await runDailyDigest();
+});
+
+// Email retry every 5 min
+new Cron('*/5 * * * *', async () => {
+  await runEmailRetry();
+});
+
+console.log('Worker started');
+```
+
+---
+
+## 6. Sentry setup
+
+```bash
+cd apps/web
+pnpm dlx @sentry/wizard@latest -i nextjs
+```
+
+Follow the wizard. It creates `sentry.client.config.ts`, `sentry.server.config.ts`, and updates `next.config.ts`.
+
+---
+
+## 7. Install the skills for Claude Code
+
+Your brief lists several skills. Install each per that project's instructions:
+
+| Skill | Source |
+|---|---|
+| `frontend-design` | Local: `~/.claude/skills/frontend-design/` |
+| `shadcn/ui` | https://ui.shadcn.com/docs/skills |
+| `subagent-driven-development` | Wherever your team stores it |
+| `test-driven-development` | Same |
+| `Expo` (for Phase 4 native) | https://docs.expo.dev/skills/ |
+| `june-carousel-styles` | Already in your skills dir, useful for partner templates |
+
+Verify Claude Code sees them:
+
+```bash
+claude code --list-skills
+```
+
+---
+
+## 8. Cloud deployments (staging)
+
+### 8.1 Supabase cloud project
+
+```bash
+# From repo root, link to a Supabase cloud project you created in the dashboard
+supabase link --project-ref <your-project-ref>
+
+# Push your schema
+supabase db push
+```
+
+### 8.2 Vercel
+
+Connect the GitHub repo:
+
+```bash
+cd apps/web
+npx vercel link
+npx vercel env add NEXT_PUBLIC_SUPABASE_URL production
+npx vercel env add NEXT_PUBLIC_SUPABASE_URL preview
+# repeat for each env var in .env.local
+```
+
+Set the **Root Directory** in Vercel project settings to `apps/web`. Set the **Framework Preset** to Next.js.
+
+### 8.3 Railway
+
+```bash
+cd apps/worker
+railway login
+railway init
+railway link
+# Railway auto-detects Dockerfile. Set env vars via the dashboard.
+railway up
+```
+
+Set env vars in the Railway dashboard: `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `RESEND_API_KEY`, `SENTRY_DSN`, `TZ=Europe/Brussels`.
+
+### 8.4 Resend
+
+1. Create Resend account, switch to EU region.
+2. Add and verify your domain (DKIM records via Cloudflare or your DNS).
+3. Create API keys: one for dev (restricted), one for prod.
+4. Add dev key to `apps/web/.env.local`, prod key to Vercel + Railway.
+
+---
+
+## 9. First run
+
+From repo root:
+
+```bash
+pnpm install
+pnpm dev --filter=web
+```
+
+Visit `http://localhost:3000/p/ihpo?shop=demo-shop-qr`. You should see the IHPO landing page.
+
+Visit `http://localhost:3000/admin` — the CMS. Create a first admin user via `supabase` CLI or by SQL insert into `profiles`.
+
+---
+
+## 10. Running tests
+
+```bash
+# Unit
+pnpm test --filter=@june/shared
+
+# E2E (requires dev server running)
+pnpm --filter=web exec playwright test
+
+# Install browsers first time
+pnpm --filter=web exec playwright install
+```
+
+---
+
+## 11. Optional: Antigravity + Claude Code workflow
+
+Your brief mentions Antigravity. Workflow:
+
+1. Open the repo in Antigravity.
+2. Keep this `docs/` folder as the shared context.
+3. Feed one briefing at a time from `briefings/` into Claude Code's session (`/init` or as the first user message).
+4. Use `subagent-driven-development` to spin up parallel subagents for independent modules (e.g. landing page + CMS auth can go in parallel).
+5. Commit per briefing. PR per briefing for review.
+
+---
+
+## 12. Troubleshooting
+
+| Symptom | Fix |
+|---|---|
+| `supabase start` fails with port conflict | `supabase stop && supabase start` — or pick custom ports in `supabase/config.toml` |
+| Next.js can't find `@/components/ui/*` | shadcn wasn't initialised. Run `pnpm dlx shadcn@latest init` |
+| Resend emails bounce | Using unverified domain in prod. Add DKIM records and verify in Resend dashboard. |
+| RLS blocks everything in dev | You're querying as anon, not a logged-in admin. Either log in or use service role client server-side. |
+| Sentry not capturing | Check `SENTRY_DSN` is set in both client env (NEXT_PUBLIC_) and server env. |
+| Vercel build fails on monorepo | Root Directory must be `apps/web`; Install Command `cd ../.. && pnpm install`; Build Command `cd ../.. && pnpm --filter=web build` |
+
+---
+
+## 13. What's next
+
+Once this setup runs, open `04_DELIVERY_PLAN.md` and start on **Briefing 01**. The briefings assume this setup is complete.
