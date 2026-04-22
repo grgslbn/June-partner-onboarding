@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
+    "@june/db": "workspace:*",
     "@react-email/components": "^1.0.12",
     "@sentry/nextjs": "^10.49.0",
     "@supabase/ssr": "^0.10.2",
