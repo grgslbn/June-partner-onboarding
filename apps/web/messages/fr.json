@@ -15,17 +15,25 @@
       "lastName": "Nom",
       "email": "Adresse e-mail",
       "phone": "Numéro de téléphone",
-      "tcAccept": "J'accepte les conditions générales",
+      "tcAccept": "J'accepte les <link>conditions générales</link>",
       "submitButton": "Envoyer",
+      "submitting": "Envoi en cours…",
       "validation": {
         "required": "Ce champ est requis",
         "email": "Veuillez saisir une adresse e-mail valide"
+      },
+      "submitError": {
+        "generic": "Une erreur s'est produite. Veuillez réessayer.",
+        "server": "Problème temporaire. Veuillez réessayer dans un instant.",
+        "network": "Vérifiez votre connexion internet et réessayez.",
+        "tooFast": "Un instant — veuillez réessayer."
       }
     },
     "success": {
       "title": "Merci !",
       "message": "Votre inscription a bien été reçue.",
-      "checkEmail": "Nous vous avons envoyé un e-mail de confirmation."
+      "checkEmail": "Nous vous avons envoyé un e-mail de confirmation.",
+      "reference": "Votre référence"
     }
   },
   "cms": {
