@@ -15,17 +15,25 @@
       "lastName": "Achternaam",
       "email": "E-mailadres",
       "phone": "Telefoonnummer",
-      "tcAccept": "Ik ga akkoord met de algemene voorwaarden",
+      "tcAccept": "Ik ga akkoord met de <link>algemene voorwaarden</link>",
       "submitButton": "Verzenden",
+      "submitting": "Bezig met verzenden…",
       "validation": {
         "required": "Dit veld is verplicht",
         "email": "Gelieve een geldig e-mailadres in te voeren"
+      },
+      "submitError": {
+        "generic": "Er is iets fout gegaan. Probeer het opnieuw.",
+        "server": "Tijdelijke storing. Probeer het zo meteen opnieuw.",
+        "network": "Controleer uw internetverbinding en probeer opnieuw.",
+        "tooFast": "Even rustig aan — probeer opnieuw."
       }
     },
     "success": {
       "title": "Bedankt!",
       "message": "Uw inschrijving is ontvangen.",
-      "checkEmail": "We hebben u een bevestigingsmail gestuurd."
+      "checkEmail": "We hebben u een bevestigingsmail gestuurd.",
+      "reference": "Uw referentie"
     }
   },
   "cms": {

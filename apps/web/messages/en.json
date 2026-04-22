@@ -15,17 +15,25 @@
       "lastName": "Last name",
       "email": "Email address",
       "phone": "Phone number",
-      "tcAccept": "I accept the terms and conditions",
+      "tcAccept": "I accept the <link>terms and conditions</link>",
       "submitButton": "Submit",
+      "submitting": "Submitting…",
       "validation": {
         "required": "This field is required",
         "email": "Please enter a valid email address"
+      },
+      "submitError": {
+        "generic": "Something went wrong. Please try again.",
+        "server": "Temporary issue. Please try again shortly.",
+        "network": "Check your internet connection and try again.",
+        "tooFast": "Slow down — please try again."
       }
     },
     "success": {
       "title": "Thank you!",
       "message": "Your registration has been received.",
-      "checkEmail": "We've sent you a confirmation email."
+      "checkEmail": "We've sent you a confirmation email.",
+      "reference": "Your reference"
     }
   },
   "cms": {
