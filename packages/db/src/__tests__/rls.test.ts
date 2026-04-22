@@ -1,5 +1,5 @@
 import { afterAll, beforeAll, describe, expect, test } from 'vitest';
-import { createClient } from '@supabase/supabase-js';
+import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { config as loadEnv } from 'dotenv';
 import type { Database } from '../types.js';
 
@@ -23,10 +23,18 @@ const P1_SLUG = 'rlstest-p1';
 const P2_SLUG = 'rlstest-p2';
 const P1_ADMIN_EMAIL = 'rlstest-p1@test.example';
 const P2_ADMIN_EMAIL = 'rlstest-p2@test.example';
+const JUNE_ADMIN_EMAIL = 'rlstest-june@test.example';
 const TEST_PASSWORD = 'rlstest-password-ok-1234';
 
 let p1Id: string;
 let p2Id: string;
+
+async function signedIn(email: string): Promise<SupabaseClient<Database>> {
+  const client = createClient<Database>(url!, anonKey!);
+  const { error } = await client.auth.signInWithPassword({ email, password: TEST_PASSWORD });
+  if (error) throw new Error(`Sign-in failed for ${email}: ${error.message}`);
+  return client;
+}
 
 async function cleanup() {
   const { data: partners } = await service.from('partners').select('id').in('slug', [P1_SLUG, P2_SLUG]);
@@ -37,7 +45,11 @@ async function cleanup() {
   }
   const { data: list } = await service.auth.admin.listUsers();
   for (const user of list.users) {
-    if (user.email === P1_ADMIN_EMAIL || user.email === P2_ADMIN_EMAIL) {
+    if (
+      user.email === P1_ADMIN_EMAIL ||
+      user.email === P2_ADMIN_EMAIL ||
+      user.email === JUNE_ADMIN_EMAIL
+    ) {
       await service.auth.admin.deleteUser(user.id);
     }
   }
@@ -64,19 +76,29 @@ beforeAll(async () => {
     password: TEST_PASSWORD,
     email_confirm: true,
   });
-  if (p1User.error || p2User.error || !p1User.data.user || !p2User.data.user) {
-    throw new Error(`Failed to create test auth users: ${p1User.error?.message ?? p2User.error?.message}`);
+  const juneUser = await service.auth.admin.createUser({
+    email: JUNE_ADMIN_EMAIL,
+    password: TEST_PASSWORD,
+    email_confirm: true,
+  });
+  if (
+    p1User.error || p2User.error || juneUser.error ||
+    !p1User.data.user || !p2User.data.user || !juneUser.data.user
+  ) {
+    throw new Error(
+      `Failed to create test auth users: ${p1User.error?.message ?? p2User.error?.message ?? juneUser.error?.message}`,
+    );
   }
 
   const profilesInsert = await service.from('profiles').insert([
     { id: p1User.data.user.id, email: P1_ADMIN_EMAIL, role: 'partner_admin', partner_id: p1Id },
     { id: p2User.data.user.id, email: P2_ADMIN_EMAIL, role: 'partner_admin', partner_id: p2Id },
+    { id: juneUser.data.user.id, email: JUNE_ADMIN_EMAIL, role: 'june_admin', partner_id: null },
   ]);
   if (profilesInsert.error) {
     throw new Error(`Failed to create test profiles: ${profilesInsert.error.message}`);
   }
 
-  // Seed one lead for each partner so RLS has real rows to filter.
   const leadsInsert = await service.from('leads').insert([
     {
       partner_id: p1Id,
@@ -106,20 +128,45 @@ afterAll(async () => {
   await cleanup();
 }, 30_000);
 
-describe('RLS', () => {
-  test("partner_admin cannot select another partner's leads", async () => {
-    const p1Client = createClient<Database>(url!, anonKey!);
-    const { error: signInErr } = await p1Client.auth.signInWithPassword({
-      email: P1_ADMIN_EMAIL,
-      password: TEST_PASSWORD,
-    });
-    expect(signInErr).toBeNull();
+describe('RLS helpers', () => {
+  test('is_june_admin() returns true for june_admin, false for partner_admin', async () => {
+    const june = await signedIn(JUNE_ADMIN_EMAIL);
+    const { data: juneRes } = await june.rpc('is_june_admin');
+    expect(juneRes).toBe(true);
 
-    const { data: p2Leads } = await p1Client.from('leads').select().eq('partner_id', p2Id);
+    const p1 = await signedIn(P1_ADMIN_EMAIL);
+    const { data: p1Res } = await p1.rpc('is_june_admin');
+    expect(p1Res).toBe(false);
+  });
+
+  test('is_partner_admin() returns true for partner_admin, false for june_admin', async () => {
+    const p1 = await signedIn(P1_ADMIN_EMAIL);
+    const { data: p1Res } = await p1.rpc('is_partner_admin');
+    expect(p1Res).toBe(true);
+
+    const june = await signedIn(JUNE_ADMIN_EMAIL);
+    const { data: juneRes } = await june.rpc('is_partner_admin');
+    expect(juneRes).toBe(false);
+  });
+
+  test("current_partner_id() returns the signed-in admin's partner_id, null for june_admin", async () => {
+    const p1 = await signedIn(P1_ADMIN_EMAIL);
+    const { data: p1Res } = await p1.rpc('current_partner_id');
+    expect(p1Res).toBe(p1Id);
+
+    const june = await signedIn(JUNE_ADMIN_EMAIL);
+    const { data: juneRes } = await june.rpc('current_partner_id');
+    expect(juneRes).toBeNull();
+  });
+});
+
+describe('RLS policies', () => {
+  test("partner_admin cannot select another partner's leads", async () => {
+    const p1 = await signedIn(P1_ADMIN_EMAIL);
+    const { data: p2Leads } = await p1.from('leads').select().eq('partner_id', p2Id);
     expect(p2Leads).toEqual([]);
 
-    // Positive control: P1 can see its own leads.
-    const { data: ownLeads } = await p1Client.from('leads').select().eq('partner_id', p1Id);
+    const { data: ownLeads } = await p1.from('leads').select().eq('partner_id', p1Id);
     expect(ownLeads?.length).toBeGreaterThan(0);
   });
 

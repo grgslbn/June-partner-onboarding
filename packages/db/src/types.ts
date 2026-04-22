@@ -475,8 +475,9 @@ export type Database = {
       }
     }
     Functions: {
-      current_user_partner_id: { Args: never; Returns: string }
-      current_user_role: { Args: never; Returns: string }
+      current_partner_id: { Args: never; Returns: string }
+      is_june_admin: { Args: never; Returns: boolean }
+      is_partner_admin: { Args: never; Returns: boolean }
     }
     Enums: {
       [_ in never]: never
