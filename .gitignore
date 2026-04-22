@@ -8,6 +8,11 @@ dist/
 .env.test
 .vercel/
 .DS_Store
+
+# macOS iCloud sync artifacts
+* 2.*
+* 3.*
+
 *.log
 coverage/
 playwright-report/
