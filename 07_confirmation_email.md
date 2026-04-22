@@ -10,6 +10,8 @@ After a lead submits, we send a branded confirmation email within seconds. Partn
 
 See `01_PRD.md` §5.7 for template variable list and `02_ARCHITECTURE.md` §5 for the request flow.
 
+**Design skills** (in `~/.claude/skills/`, see `docs/03_DEV_SETUP.md` §7.1): `designer-toolkit/ux-writing` for subject and body tone across locales.
+
 ## Goal
 
 Real Resend-backed confirmation email that renders per-partner Markdown copy with substituted variables. If partner has `iban_behavior = 'deferred'`, email includes the magic link. Failed sends are logged and retried by the worker (retry queue; real worker impl in Briefing 18).

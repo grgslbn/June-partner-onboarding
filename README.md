@@ -56,7 +56,7 @@ Before Phase 3:
 3. Paste the briefing as the first user message. Claude Code should read the referenced doc sections before touching code.
 4. One briefing = one PR = one feature. Don't batch them.
 5. Briefings 01–07 are full length; 08–23 are in a combined compact file. Expand any of those to full length before you start it — by then you'll have working code to reference.
-6. Use the skills listed in your original brief: `frontend-design`, `shadcn/ui`, `subagent-driven-development`, `test-driven-development`.
+6. See `docs/03_DEV_SETUP.md` §7.1 Design skills for the per-briefing design-skill mapping. Also use `shadcn/ui`, `subagent-driven-development`, `test-driven-development` where available.
 
 ---
 

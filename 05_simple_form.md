@@ -10,7 +10,7 @@ The Simple preset is the flagship "30-second" flow. Three fields: first+last nam
 
 See `01_PRD.md` §5.4 for the field spec.
 
-**Before starting:** read `/mnt/skills/public/frontend-design/SKILL.md` for form patterns.
+**Design skills** (in `~/.claude/skills/`, see `docs/03_DEV_SETUP.md` §7.1): `ui-design/responsive-design`, `interaction-design/error-handling-ux`, `interaction-design/feedback-patterns`, `interaction-design/loading-states`, `designer-toolkit/ux-writing`. Run `/error-flow` to map validation and submit states.
 
 ## Goal
 

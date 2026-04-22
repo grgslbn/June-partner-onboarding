@@ -282,22 +282,47 @@ Follow the wizard. It creates `sentry.client.config.ts`, `sentry.server.config.t
 
 ## 7. Install the skills for Claude Code
 
-Your brief lists several skills. Install each per that project's instructions:
-
 | Skill | Source |
 |---|---|
-| `frontend-design` | Local: `~/.claude/skills/frontend-design/` |
 | `shadcn/ui` | https://ui.shadcn.com/docs/skills |
 | `subagent-driven-development` | Wherever your team stores it |
 | `test-driven-development` | Same |
 | `Expo` (for Phase 4 native) | https://docs.expo.dev/skills/ |
-| `june-carousel-styles` | Already in your skills dir, useful for partner templates |
 
 Verify Claude Code sees them:
 
 ```bash
 claude code --list-skills
 ```
+
+### 7.1 Design skills
+
+Design skills live under `~/.claude/skills/`, grouped into packs. Each pack has a `skills/` directory with child skills plus a `commands/` directory with slash commands. When a briefing says "consult design skills", it refers to the child skills below — not to a single monolithic `frontend-design` skill (that one does not exist on this machine).
+
+**Packs and child skills:**
+
+| Pack | Child skills |
+|---|---|
+| `ui-design/` | `color-system`, `dark-mode-design`, `data-visualization`, `illustration-style`, `layout-grid`, `responsive-design`, `spacing-system`, `typography-scale`, `visual-hierarchy` |
+| `design-systems/` | `accessibility-audit`, `component-spec`, `design-token`, `documentation-template`, `icon-system`, `naming-convention`, `pattern-library`, `theming-system` |
+| `interaction-design/` | `animation-principles`, `error-handling-ux`, `feedback-patterns`, `gesture-patterns`, `loading-states`, `micro-interaction-spec`, `state-machine` |
+| `designer-toolkit/` | `case-study`, `design-rationale`, `design-system-adoption`, `design-token-audit`, `presentation-deck`, `ux-writing` |
+
+**Slash commands** live under each pack's `commands/` directory — e.g. `/design-screen`, `/responsive-audit`, `/color-palette`, `/type-system` (ui-design); `/create-component`, `/tokenize`, `/audit-system` (design-systems); `/design-interaction`, `/error-flow`, `/map-states` (interaction-design); `/build-presentation`, `/write-case-study`, `/write-rationale` (designer-toolkit).
+
+**Per-briefing consumers** — which briefing pulls which skills:
+
+| Briefing | Skills | Command |
+|---|---|---|
+| 04 Public landing | `ui-design/{layout-grid, visual-hierarchy, spacing-system, typography-scale, color-system}`, `design-systems/theming-system` | `/design-screen` |
+| 05 Simple form | `ui-design/responsive-design`, `interaction-design/{error-handling-ux, feedback-patterns, loading-states}`, `designer-toolkit/ux-writing` | `/error-flow` |
+| 07 Confirmation email | `designer-toolkit/ux-writing` | — |
+| 08 Standard form | `interaction-design/{state-machine, micro-interaction-spec}` | — |
+| 09 Complete stepper | `interaction-design/{state-machine, micro-interaction-spec, loading-states}` | — |
+| 11 Partner theming | `design-systems/{theming-system, design-token, component-spec}` | `/tokenize` |
+| 13–16 CMS CRUD | `design-systems/{component-spec, pattern-library, naming-convention, icon-system}` | `/create-component` |
+| 17 Analytics | `ui-design/data-visualization` | — |
+| 20 A11y pass | `design-systems/accessibility-audit` (framework) + `axe-playwright` (CI automation) | — |
 
 ---
 
