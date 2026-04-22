@@ -69,19 +69,18 @@ export default function SimpleForm({
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        event_type: 'form_started',
-        partner_id: partner.id,
-        shop_id: shop?.id ?? null,
-        meta: { locale, slug },
+        eventType: 'form_started',
+        partnerSlug: slug,
+        shopToken: shop?.qr_token ?? null,
+        meta: { locale },
       }),
       keepalive: true,
     }).catch(() => {
-      // stub endpoint — ignore
+      // analytics is fire-and-forget
     });
-  }, [partner.id, shop?.id, locale, slug]);
+  }, [partner.id, shop?.id, shop?.qr_token, locale, slug]);
 
   const onSubmit = async (data: SimpleLeadInput) => {
-    if (hpRef.current?.value) return; // bot: silent drop
     if (Date.now() - mountedAt.current < MIN_FILL_MS) {
       toast.error(t('submitError.tooFast'));
       return;
@@ -94,10 +93,11 @@ export default function SimpleForm({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...data,
-          partner_slug: slug,
-          shop_token: shop?.qr_token ?? null,
-          rep_id: rep?.id ?? null,
+          partnerSlug: slug,
+          shopToken: shop?.qr_token ?? null,
+          salesRepId: rep?.id ?? null,
           locale,
+          honeypot: hpRef.current?.value ?? '',
         }),
       });
       if (!res.ok) {
@@ -106,8 +106,8 @@ export default function SimpleForm({
         );
         return;
       }
-      const body: { confirmation_id?: string } = await res.json().catch(() => ({}));
-      const ref = body.confirmation_id ?? '';
+      const body: { confirmationId?: string } = await res.json().catch(() => ({}));
+      const ref = body.confirmationId ?? '';
       router.push(`/${locale}/p/${slug}/done?ref=${encodeURIComponent(ref)}`);
     } catch {
       toast.error(t('submitError.network'));
