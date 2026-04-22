@@ -1,22 +1,27 @@
 {
   "public": {
     "landing": {
-      "welcome": "Welkom",
-      "selectRep": "Selecteer uw verkoper",
-      "startButton": "Start inschrijving",
-      "repPickerLabel": "Wie helpt u vandaag?",
+      "heroHeadline": "Schakel uw energiecontract\nautomatisch over",
+      "heroSubline": "en bespaar doorlopend",
+      "trustBadge": "{partnerName} & June helpen u besparen",
+      "repPickerLabel": "Wie helpt u?",
       "repPickerPlaceholder": "Kies een verkoper",
+      "repPickerSelected": "Met {name}",
       "continueWithoutRep": "Verder zonder verkoper",
-      "noEngagement": "Zonder verplichtingen · op elk moment opzegbaar",
-      "poweredBy": "Aangeboden door"
+      "noEngagement": "Zonder verplichtingen · op elk moment opzegbaar"
     },
     "form": {
+      "formCardHeading": "Beginnen — zo eenvoudig",
+      "formCardSubline": "2 velden volstaan. Wij regelen de rest.",
       "firstName": "Voornaam",
       "lastName": "Achternaam",
       "email": "E-mailadres",
       "phone": "Telefoonnummer",
-      "tcAccept": "Ik ga akkoord met de <link>algemene voorwaarden</link>",
-      "submitButton": "Verzenden",
+      "placeholderFirstName": "Katrijn",
+      "placeholderLastName": "Declerck",
+      "placeholderEmail": "katrijn@voorbeeld.be",
+      "tcAccept": "Ik ga akkoord met de <link>algemene voorwaarden</link> en het privacybeleid {partnerName} × June.",
+      "submitButton": "Mijn contract gratis overstappen",
       "submitting": "Bezig met verzenden…",
       "validation": {
         "required": "Dit veld is verplicht",

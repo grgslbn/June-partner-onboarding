@@ -1,24 +1,18 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { Button } from '@/components/ui/button';
+import { useTranslations } from 'next-intl';
 import type { Locale } from '@june/shared';
+import HeroRepPicker from '@/components/public/HeroRepPicker';
+import SimpleForm from '@/components/public/SimpleForm';
 
 type Partner = {
   id: string;
   name: string;
   logoUrl: string | null;
   primaryColor: string;
-  accentColor: string;
   foregroundColor: '#000000' | '#FFFFFF';
+  tcUrl: string | null;
 };
 
 type Shop = { id: string; name: string; qr_token: string };
@@ -30,28 +24,18 @@ export default function LandingScreen({
   reps,
   locale,
   slug,
-  slogan,
-  labels,
 }: {
   partner: Partner;
   shop: Shop | null;
   reps: Rep[];
   locale: Locale;
   slug: string;
-  slogan: string;
-  labels: {
-    welcome: string;
-    startButton: string;
-    repPickerLabel: string;
-    repPickerPlaceholder: string;
-    continueWithoutRep: string;
-    noEngagement: string;
-    poweredBy: string;
-  };
 }) {
-  const router = useRouter();
+  const tLanding = useTranslations('public.landing');
+  const tForm = useTranslations('public.form');
   const [selectedRepId, setSelectedRepId] = useState<string | null>(null);
 
+  // landing_view fires once on mount (unchanged from the pre-consolidation flow).
   useEffect(() => {
     fetch('/api/events', {
       method: 'POST',
@@ -63,115 +47,121 @@ export default function LandingScreen({
         meta: { locale },
       }),
       keepalive: true,
-    }).catch(() => {
-      // analytics is fire-and-forget
-    });
+    }).catch(() => {});
   }, [shop?.qr_token, locale, slug]);
 
-  const hasReps = reps.length > 0;
-  const ctaReady = !hasReps || selectedRepId !== null;
-
-  const onStart = () => {
-    const qs = new URLSearchParams();
-    if (shop) qs.set('shop', shop.qr_token);
-    if (selectedRepId) qs.set('rep', selectedRepId);
-    const query = qs.toString();
-    router.push(`/${locale}/p/${slug}/form${query ? `?${query}` : ''}`);
-  };
-
-  const heroStyle = {
+  const rootStyle = {
     '--partner-primary': partner.primaryColor,
     '--partner-fg': partner.foregroundColor,
-    '--partner-fg-muted':
-      partner.foregroundColor === '#FFFFFF'
-        ? 'rgba(255,255,255,0.78)'
-        : 'rgba(0,0,0,0.65)',
   } as React.CSSProperties;
 
+  const hasShop = shop !== null;
+  const hasReps = reps.length > 0;
+  const showRepPicker = hasShop && hasReps;
+  const rep = selectedRepId ? { id: selectedRepId } : null;
+
   return (
-    <main style={heroStyle} className="mx-auto flex min-h-screen max-w-[420px] flex-col">
+    <main
+      style={rootStyle}
+      className="mx-auto flex min-h-screen max-w-[420px] flex-col bg-white"
+    >
       <header
-        className="flex flex-1 flex-col items-center justify-center px-6 pt-20 pb-16 text-center"
-        style={{
-          backgroundColor: 'var(--partner-primary)',
-          color: 'var(--partner-fg)',
-        }}
+        className="flex flex-col items-center px-6 pt-14 pb-12 text-center"
+        style={{ backgroundColor: 'var(--partner-primary)', color: 'var(--partner-fg)' }}
       >
-        {partner.logoUrl ? (
-          <img
-            src={partner.logoUrl}
-            alt={partner.name}
-            className="max-h-20 w-auto"
-          />
-        ) : (
-          <div className="text-3xl font-semibold tracking-tight">{partner.name}</div>
-        )}
-
-        <h1 className="mt-16 text-4xl font-semibold leading-tight tracking-tight md:text-5xl">
-          {labels.welcome}
-        </h1>
-
-        {slogan && (
-          <p className="mt-4 max-w-[22ch] text-lg leading-snug">{slogan}</p>
-        )}
-      </header>
-
-      <section className="flex flex-col gap-6 bg-white px-6 pt-12 pb-12 text-neutral-900">
-        {shop && (
-          <div className="flex flex-col gap-2">
-            <label
-              htmlFor="rep-picker"
-              className="text-sm font-medium text-neutral-700"
+        {/* Logo pair — x-height matched via ratios in globals.css. */}
+        <div className="flex items-baseline gap-3">
+          {partner.logoUrl ? (
+            <img
+              src={partner.logoUrl}
+              alt={partner.name}
+              className="w-auto"
+              style={{ height: 'calc(var(--logo-xh) / var(--partner-ratio))' }}
+            />
+          ) : (
+            <span
+              className="font-bold tracking-tight"
+              style={{ fontSize: 'calc(var(--logo-xh) / var(--partner-ratio))', lineHeight: 1 }}
             >
-              {labels.repPickerLabel}
-            </label>
-
-            {hasReps ? (
-              <Select
-                value={selectedRepId ?? undefined}
-                onValueChange={(value) => setSelectedRepId(value)}
-              >
-                <SelectTrigger id="rep-picker" className="h-12 w-full">
-                  <SelectValue placeholder={labels.repPickerPlaceholder} />
-                </SelectTrigger>
-                <SelectContent>
-                  {reps.map((r) => (
-                    <SelectItem key={r.id} value={r.id}>
-                      {r.display_name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            ) : (
-              <p className="text-sm text-neutral-600">{labels.continueWithoutRep}</p>
-            )}
-          </div>
-        )}
-
-        <Button
-          type="button"
-          onClick={onStart}
-          disabled={!ctaReady}
-          className="h-14 w-full text-base font-medium"
-          style={{
-            backgroundColor: 'var(--partner-primary)',
-            color: 'var(--partner-fg)',
-          }}
-        >
-          {labels.startButton}
-        </Button>
-
-        <p className="text-center text-xs text-neutral-500">{labels.noEngagement}</p>
-
-        <div className="flex items-center justify-center gap-2 text-xs text-neutral-500">
-          <span>{labels.poweredBy}</span>
+              {partner.name}
+            </span>
+          )}
           <img
             src="https://raw.githubusercontent.com/grgslbn/June-brand-assets/main/logo/June_logo_white.svg"
             alt="June"
-            className="h-3 w-auto"
-            style={{ filter: 'invert(1)' }}
+            className="w-auto"
+            style={{ height: 'calc(var(--logo-xh) / var(--june-ratio))' }}
           />
         </div>
+
+        <h1
+          className="mt-10 text-[26px] font-bold leading-[1.15] tracking-[-0.02em] whitespace-pre-line"
+        >
+          {tLanding('heroHeadline')}
+        </h1>
+        {/* Bumped to text-xl + bold so 100% white on the partner hero clears
+            WCAG AA "large text" (≥14pt bold needs only 3:1, white on #E53935
+            is ~4.18:1). The mockup's 75% opacity sat at 2.96:1 — a11y blocker. */}
+        <p className="mt-3 text-xl font-bold leading-snug">
+          {tLanding('heroSubline')}
+        </p>
+
+        <div className="mt-7 flex flex-col items-center gap-3">
+          {showRepPicker && (
+            <HeroRepPicker
+              reps={reps}
+              selectedId={selectedRepId}
+              onSelect={setSelectedRepId}
+              labels={{
+                placeholder: tLanding('repPickerLabel'),
+                selected: (name) => tLanding('repPickerSelected', { name }),
+              }}
+            />
+          )}
+
+          {/* Translucent pill. bg-white/10 (mockup's lighten) drops contrast on
+              partner red below WCAG AA; bg-black/10 darkens the composite and
+              keeps white text at >=5:1. Same "translucent" feel, inverted
+              blend direction. */}
+          <div className="inline-flex items-center rounded-full border border-white bg-black/10 px-4 py-2 text-sm font-medium">
+            {tLanding('trustBadge', { partnerName: partner.name })}
+          </div>
+        </div>
+      </header>
+
+      {/* Progress bar — hard-edged, first of three segments filled for Simple preset. */}
+      <div className="flex gap-1.5 bg-white px-6 pt-3">
+        <div
+          className="h-1 flex-1 rounded-full"
+          style={{ backgroundColor: 'var(--partner-primary)' }}
+          aria-hidden="true"
+        />
+        <div className="h-1 flex-1 rounded-full bg-neutral-200" aria-hidden="true" />
+        <div className="h-1 flex-1 rounded-full bg-neutral-200" aria-hidden="true" />
+      </div>
+
+      <section
+        id="form"
+        className="flex scroll-mt-4 flex-col gap-6 bg-white px-6 pt-6 pb-10"
+      >
+        <div>
+          <h2 className="text-[22px] font-medium leading-tight tracking-tight text-neutral-900">
+            {tForm('formCardHeading')}
+          </h2>
+          <p className="mt-1 text-sm text-neutral-500">{tForm('formCardSubline')}</p>
+        </div>
+
+        <SimpleForm
+          partner={{ id: partner.id, name: partner.name, tcUrl: partner.tcUrl }}
+          shop={shop ? { id: shop.id, qr_token: shop.qr_token } : null}
+          rep={rep}
+          locale={locale}
+          slug={slug}
+        />
+
+        <p className="text-center text-xs text-neutral-500">
+          {tLanding('noEngagement')}
+        </p>
       </section>
     </main>
   );

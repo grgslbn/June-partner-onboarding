@@ -1,22 +1,27 @@
 {
   "public": {
     "landing": {
-      "welcome": "Welcome",
-      "selectRep": "Choose your sales advisor",
-      "startButton": "Start onboarding",
-      "repPickerLabel": "Who's helping you today?",
+      "heroHeadline": "Switch your energy contract\nautomatically",
+      "heroSubline": "and keep saving, year-round",
+      "trustBadge": "{partnerName} & June help you save",
+      "repPickerLabel": "Who's helping you?",
       "repPickerPlaceholder": "Pick an advisor",
+      "repPickerSelected": "With {name}",
       "continueWithoutRep": "Continue without an advisor",
-      "noEngagement": "No commitment · cancel anytime",
-      "poweredBy": "Powered by"
+      "noEngagement": "No commitment · cancel anytime"
     },
     "form": {
+      "formCardHeading": "Start — it's simple",
+      "formCardSubline": "2 fields are enough. We handle the rest.",
       "firstName": "First name",
       "lastName": "Last name",
       "email": "Email address",
       "phone": "Phone number",
-      "tcAccept": "I accept the <link>terms and conditions</link>",
-      "submitButton": "Submit",
+      "placeholderFirstName": "Jane",
+      "placeholderLastName": "Doe",
+      "placeholderEmail": "jane@example.com",
+      "tcAccept": "I accept the <link>terms and conditions</link> and the {partnerName} × June privacy policy.",
+      "submitButton": "Switch my contract for free",
       "submitting": "Submitting…",
       "validation": {
         "required": "This field is required",

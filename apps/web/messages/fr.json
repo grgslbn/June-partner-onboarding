@@ -1,22 +1,27 @@
 {
   "public": {
     "landing": {
-      "welcome": "Bienvenue",
-      "selectRep": "Sélectionnez votre conseiller",
-      "startButton": "Commencer l'inscription",
-      "repPickerLabel": "Qui vous aide aujourd'hui ?",
+      "heroHeadline": "Faites basculer votre contrat\nd'énergie automatiquement",
+      "heroSubline": "et épargnez en permanence",
+      "trustBadge": "{partnerName} & June vous font économiser",
+      "repPickerLabel": "Qui vous aide ?",
       "repPickerPlaceholder": "Choisissez un conseiller",
+      "repPickerSelected": "Avec {name}",
       "continueWithoutRep": "Continuer sans conseiller",
-      "noEngagement": "Sans engagement · Résiliable à tout moment",
-      "poweredBy": "Propulsé par"
+      "noEngagement": "Sans engagement · Résiliable à tout moment"
     },
     "form": {
+      "formCardHeading": "Commencer — c'est simple",
+      "formCardSubline": "2 champs suffit. On s'occupe du reste.",
       "firstName": "Prénom",
       "lastName": "Nom",
       "email": "Adresse e-mail",
       "phone": "Numéro de téléphone",
-      "tcAccept": "J'accepte les <link>conditions générales</link>",
-      "submitButton": "Envoyer",
+      "placeholderFirstName": "Marie",
+      "placeholderLastName": "Dupont",
+      "placeholderEmail": "marie@exemple.com",
+      "tcAccept": "J'accepte les <link>conditions générales</link> et la politique de confidentialité {partnerName} × June.",
+      "submitButton": "Basculer mon contrat gratuitement",
       "submitting": "Envoi en cours…",
       "validation": {
         "required": "Ce champ est requis",
