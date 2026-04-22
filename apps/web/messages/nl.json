@@ -1,0 +1,36 @@
+{
+  "public": {
+    "landing": {
+      "welcome": "Welkom",
+      "selectRep": "Selecteer uw verkoper",
+      "startButton": "Start inschrijving"
+    },
+    "form": {
+      "firstName": "Voornaam",
+      "lastName": "Achternaam",
+      "email": "E-mailadres",
+      "phone": "Telefoonnummer",
+      "tcAccept": "Ik ga akkoord met de algemene voorwaarden",
+      "submitButton": "Verzenden",
+      "validation": {
+        "required": "Dit veld is verplicht",
+        "email": "Gelieve een geldig e-mailadres in te voeren"
+      }
+    },
+    "success": {
+      "title": "Bedankt!",
+      "message": "Uw inschrijving is ontvangen.",
+      "checkEmail": "We hebben u een bevestigingsmail gestuurd."
+    }
+  },
+  "cms": {
+    "nav": {
+      "partners": "Partners",
+      "shops": "Winkels",
+      "reps": "Verkopers",
+      "leads": "Leads",
+      "analytics": "Analytics",
+      "settings": "Instellingen"
+    }
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "public": {
+    "landing": {
+      "welcome": "Bienvenue",
+      "selectRep": "Sélectionnez votre conseiller",
+      "startButton": "Commencer l'inscription"
+    },
+    "form": {
+      "firstName": "Prénom",
+      "lastName": "Nom",
+      "email": "Adresse e-mail",
+      "phone": "Numéro de téléphone",
+      "tcAccept": "J'accepte les conditions générales",
+      "submitButton": "Envoyer",
+      "validation": {
+        "required": "Ce champ est requis",
+        "email": "Veuillez saisir une adresse e-mail valide"
+      }
+    },
+    "success": {
+      "title": "Merci !",
+      "message": "Votre inscription a bien été reçue.",
+      "checkEmail": "Nous vous avons envoyé un e-mail de confirmation."
+    }
+  },
+  "cms": {
+    "nav": {
+      "partners": "Partenaires",
+      "shops": "Magasins",
+      "reps": "Conseillers",
+      "leads": "Prospects",
+      "analytics": "Analytique",
+      "settings": "Paramètres"
+    }
+  }
+}
