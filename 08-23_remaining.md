@@ -179,6 +179,8 @@ Format for each: when you expand it, copy the scaffold from Briefing 05 and fill
 
 ## 18 — Daily Digest Worker (Week 5)
 
+> **Deployment note:** No Dockerfile for the worker. Railway auto-detects the Node app via Nixpacks (uses `package.json` `build` + `start` scripts). Use `railway.json` only if you need custom build steps; the defaults should work.
+
 **Prereq:** 07 (retry queue), 17 (analytics) · **Effort:** 4h
 
 **Key tasks:**
