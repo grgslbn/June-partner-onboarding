@@ -14,6 +14,7 @@ type PartnerRow = {
   locales_enabled: string[];
   default_locale: string;
   tc_url_i18n: Record<string, unknown>;
+  content_status: string;
 };
 
 type CacheEntry = { partner: PartnerRow | null; fetchedAt: number };
@@ -29,7 +30,7 @@ export async function getCachedPartnerBySlug(slug: string): Promise<PartnerRow |
   const supabase = createServiceClient();
   const { data } = await supabase
     .from('partners')
-    .select('id, slug, name, active, flow_preset, iban_behavior, locales_enabled, default_locale, tc_url_i18n')
+    .select('id, slug, name, active, flow_preset, iban_behavior, locales_enabled, default_locale, tc_url_i18n, content_status')
     .eq('slug', slug)
     .maybeSingle();
 

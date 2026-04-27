@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { getCurrentProfile } from '@/lib/auth/get-current-profile';
 
 export const metadata = { title: 'Dashboard — June CMS' };
@@ -22,10 +23,15 @@ export default async function AdminDashboardPage() {
 
         <div className="space-y-2 text-sm text-gray-500">
           {profile.role === 'june_admin' ? (
-            <p>
-              You have full access. Partners CRUD, shops, reps, analytics, and
-              cross-partner views are coming in Briefings 13–17.
-            </p>
+            <div className="space-y-3">
+              <p>You have full access.</p>
+              <Link
+                href="/admin/partners"
+                className="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50"
+              >
+                Manage partners →
+              </Link>
+            </div>
           ) : (
             <p>
               You have access to your partner configuration. More features are

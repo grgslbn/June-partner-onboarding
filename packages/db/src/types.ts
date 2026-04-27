@@ -300,7 +300,9 @@ export type Database = {
           active: boolean
           confirmation_email_body_i18n: Json
           confirmation_email_subject_i18n: Json
+          content_status: string
           created_at: string | null
+          danger_color: string | null
           default_locale: string
           digest_partner_email: string | null
           flow_preset: string
@@ -308,13 +310,18 @@ export type Database = {
           id: string
           locales_enabled: string[]
           logo_url: string | null
+          muted_text_color: string | null
           name: string
           primary_color: string
+          privacy_url_i18n: Json
           product_sold: string
           savings_sim_enabled: boolean
           slogan_i18n: Json
           slug: string
+          success_color: string | null
           tc_url_i18n: Json
+          tertiary_color: string | null
+          trust_badge_i18n: Json
           updated_at: string | null
         }
         Insert: {
@@ -322,7 +329,9 @@ export type Database = {
           active?: boolean
           confirmation_email_body_i18n?: Json
           confirmation_email_subject_i18n?: Json
+          content_status?: string
           created_at?: string | null
+          danger_color?: string | null
           default_locale?: string
           digest_partner_email?: string | null
           flow_preset?: string
@@ -330,13 +339,18 @@ export type Database = {
           id?: string
           locales_enabled?: string[]
           logo_url?: string | null
+          muted_text_color?: string | null
           name: string
           primary_color?: string
+          privacy_url_i18n?: Json
           product_sold?: string
           savings_sim_enabled?: boolean
           slogan_i18n?: Json
           slug: string
+          success_color?: string | null
           tc_url_i18n?: Json
+          tertiary_color?: string | null
+          trust_badge_i18n?: Json
           updated_at?: string | null
         }
         Update: {
@@ -344,7 +358,9 @@ export type Database = {
           active?: boolean
           confirmation_email_body_i18n?: Json
           confirmation_email_subject_i18n?: Json
+          content_status?: string
           created_at?: string | null
+          danger_color?: string | null
           default_locale?: string
           digest_partner_email?: string | null
           flow_preset?: string
@@ -352,13 +368,18 @@ export type Database = {
           id?: string
           locales_enabled?: string[]
           logo_url?: string | null
+          muted_text_color?: string | null
           name?: string
           primary_color?: string
+          privacy_url_i18n?: Json
           product_sold?: string
           savings_sim_enabled?: boolean
           slogan_i18n?: Json
           slug?: string
+          success_color?: string | null
           tc_url_i18n?: Json
+          tertiary_color?: string | null
+          trust_badge_i18n?: Json
           updated_at?: string | null
         }
         Relationships: []
