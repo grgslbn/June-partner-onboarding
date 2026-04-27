@@ -25,12 +25,20 @@ export default async function AdminDashboardPage() {
           {profile.role === 'june_admin' ? (
             <div className="space-y-3">
               <p>You have full access.</p>
-              <Link
-                href="/admin/partners"
-                className="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50"
-              >
-                Manage partners →
-              </Link>
+              <div className="flex flex-wrap gap-3">
+                <Link
+                  href="/admin/partners"
+                  className="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50"
+                >
+                  Manage partners →
+                </Link>
+                <Link
+                  href="/admin/analytics"
+                  className="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50"
+                >
+                  Analytics →
+                </Link>
+              </div>
             </div>
           ) : (
             <p>
