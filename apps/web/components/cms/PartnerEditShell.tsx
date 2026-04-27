@@ -76,6 +76,12 @@ export function PartnerEditShell({ partner }: { partner: Partner }) {
               Analytics →
             </Link>
             <Link
+              href={`/admin/partners/${currentPartner.id}/discounts`}
+              className="text-sm font-medium text-blue-600 hover:text-blue-800"
+            >
+              Discount codes →
+            </Link>
+            <Link
               href={`/admin/partners/${currentPartner.id}/shops`}
               className="text-sm font-medium text-blue-600 hover:text-blue-800"
             >
