@@ -56,16 +56,24 @@ export function PartnerEditShell({ partner }: { partner: Partner }) {
 
       <div className="mx-auto max-w-6xl px-6 py-6 space-y-6">
         {/* Header */}
-        <div className="flex items-center gap-4">
-          <Link href="/admin/partners" className="text-sm text-gray-500 hover:text-gray-700">
-            ← Partners
-          </Link>
-          <div className="flex items-center gap-3">
-            <h1 className="text-xl font-semibold text-gray-900">{currentPartner.name}</h1>
-            <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${STATUS_STYLES[status] ?? STATUS_STYLES.draft}`}>
-              {status}
-            </span>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <Link href="/admin/partners" className="text-sm text-gray-500 hover:text-gray-700">
+              ← Partners
+            </Link>
+            <div className="flex items-center gap-3">
+              <h1 className="text-xl font-semibold text-gray-900">{currentPartner.name}</h1>
+              <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${STATUS_STYLES[status] ?? STATUS_STYLES.draft}`}>
+                {status}
+              </span>
+            </div>
           </div>
+          <Link
+            href={`/admin/partners/${currentPartner.id}/shops`}
+            className="text-sm font-medium text-blue-600 hover:text-blue-800"
+          >
+            Manage shops →
+          </Link>
         </div>
 
         {/* Tabs */}

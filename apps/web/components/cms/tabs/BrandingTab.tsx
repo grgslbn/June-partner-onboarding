@@ -31,7 +31,7 @@ export function BrandingTab({ partner, onSaved }: { partner: Partner; onSaved: (
   });
 
   const { save } = useAutosave<Partner>({
-    partnerId: partner.id,
+    resourcePath: `partners/${partner.id}`,
     onSaved,
     onStateChange: setSaveState,
   });
