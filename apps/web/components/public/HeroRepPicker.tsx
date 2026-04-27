@@ -27,7 +27,7 @@ export default function HeroRepPicker({
 
   return (
     <SelectPrimitive.Root
-      value={selectedId ?? undefined}
+      value={selectedId ?? ''}
       onValueChange={(v) => onSelect(v)}
     >
       <SelectPrimitive.Trigger
