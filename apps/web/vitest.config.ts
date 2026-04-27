@@ -12,7 +12,6 @@ export default defineConfig({
   test: {
     include: ['__tests__/**/*.test.ts', '__tests__/**/*.test.tsx'],
     environment: 'node',
-    environmentMatchGlobs: [['**/__tests__/components/**', 'jsdom']],
     globals: true,
     setupFiles: ['./__tests__/setup.ts', './__tests__/setup.dom.ts'],
     testTimeout: 30_000,
