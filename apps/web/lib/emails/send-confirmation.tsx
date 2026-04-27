@@ -4,16 +4,17 @@ import { createServiceClient } from '@june/db';
 import { ConfirmationEmail } from '@/emails/ConfirmationEmail';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
-const FROM = process.env.RESEND_FROM_EMAIL ?? 'onboarding@pos.june-energy.app';
+const FROM_EMAIL = process.env.RESEND_FROM_EMAIL ?? 'onboarding@pos.june-energy.app';
+const REPLY_TO = process.env.REPLY_TO_EMAIL ?? 'info@june.energy';
 const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL ?? 'https://pos.june-energy.app').replace(/\/$/, '');
 
 const DEV_MODE =
   process.env.NODE_ENV !== 'production' && !process.env.RESEND_DEV_SEND;
 
 const SUBJECT_FALLBACK: Record<string, string> = {
-  fr: 'Bienvenue chez June',
-  nl: 'Welkom bij June',
-  en: 'Welcome to June',
+  fr: 'Confirmation de votre inscription {{partnerName}} × June – Réf. {{confirmationId}}',
+  nl: 'Bevestiging van uw inschrijving {{partnerName}} × June – Ref. {{confirmationId}}',
+  en: 'Confirmation of your {{partnerName}} × June sign-up – Ref. {{confirmationId}}',
 };
 
 const BODY_FALLBACK: Record<string, string> = {
@@ -114,7 +115,7 @@ export async function sendConfirmationEmail(
 
   const body = buildBody(rawBody, vars, magicLink);
 
-  const html = await render(
+  const emailEl = (
     <ConfirmationEmail
       partner={partner}
       lead={{
@@ -123,12 +124,18 @@ export async function sendConfirmationEmail(
         email: lead.email ?? '',
         confirmation_id: lead.confirmation_id ?? '',
       }}
-      body={body}
+      customBody={body}
+      magicLink={magicLink}
       shopName={shop?.name ?? undefined}
       repName={rep?.display_name ?? undefined}
       locale={locale}
-    />,
+      leadId={leadId}
+      siteUrl={SITE_URL}
+    />
   );
+
+  const html = await render(emailEl);
+  const text = await render(emailEl, { plainText: true });
 
   if (DEV_MODE) {
     console.info(
@@ -152,12 +159,21 @@ export async function sendConfirmationEmail(
     vars[key] !== undefined ? vars[key] : '',
   );
 
+  const from = `${partner.name} × June <${FROM_EMAIL}>`;
+  const unsubscribeUrl = `${SITE_URL}/${locale}/unsubscribe/${leadId}`;
+
   try {
     await resend.emails.send({
-      from: FROM,
+      from,
       to: lead.email,
+      replyTo: REPLY_TO,
       subject,
       html,
+      text,
+      headers: {
+        'List-Unsubscribe': `<mailto:${REPLY_TO}?subject=unsubscribe>, <${unsubscribeUrl}>`,
+        'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+      },
       tags: [{ name: 'leadId', value: leadId }],
     });
 
