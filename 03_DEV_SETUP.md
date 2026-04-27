@@ -140,7 +140,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=<anon key>
 SUPABASE_SERVICE_ROLE_KEY=<service role key>
 
 RESEND_API_KEY=re_dev_xxx  # use a test key from resend.com
-RESEND_FROM_EMAIL=onboarding@june-energy.app  # staging domain (Cloudflare); switch to onboarding@onboard.june.energy when prod domain confirmed
+RESEND_FROM_EMAIL=onboarding@pos.june-energy.app  # staging subdomain (Cloudflare, Resend-verified); switch to onboarding@onboard.june.energy when prod domain confirmed
 
 SENTRY_DSN=<your dev sentry dsn or blank>
 

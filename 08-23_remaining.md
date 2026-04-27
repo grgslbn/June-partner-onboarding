@@ -288,8 +288,8 @@ Format for each: when you expand it, copy the scaffold from Briefing 05 and fill
 **Prereq:** all above · **Effort:** 3h
 
 **Key tasks:**
-- Domain cutover to production (TBD — staging on `june-energy.app`; production likely `onboard.june.energy`, pending June confirmation) pointed to Vercel; SSL active.
-- Resend domain verified on prod (currently verified on `june-energy.app` for staging).
+- Domain cutover to production (TBD — staging on `pos.june-energy.app`; production likely `onboard.june.energy`, pending June confirmation) pointed to Vercel; SSL active.
+- Resend domain verified on prod (currently verified on `pos.june-energy.app` for staging).
 - Production Supabase project: schema migrated, RLS re-verified against prod config.
 - Point-in-time recovery enabled on Supabase.
 - Sentry release tracking + source map upload in CI.
