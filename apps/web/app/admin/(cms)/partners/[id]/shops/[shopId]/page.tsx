@@ -61,7 +61,15 @@ export default async function ShopEditPage({
           <span className="text-gray-900 font-medium">{shop.name}</span>
         </nav>
 
-        <h1 className="text-xl font-semibold text-gray-900">{shop.name}</h1>
+        <div className="flex items-center justify-between">
+          <h1 className="text-xl font-semibold text-gray-900">{shop.name}</h1>
+          <Link
+            href={`/admin/partners/${partnerId}/shops/${shopId}/reps`}
+            className="text-sm font-medium text-blue-600 hover:text-blue-800"
+          >
+            Manage reps →
+          </Link>
+        </div>
 
         <ShopEditShell
           shop={shop}
