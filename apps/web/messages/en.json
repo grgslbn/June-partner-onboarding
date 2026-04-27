@@ -39,6 +39,31 @@
       "message": "Your registration has been received.",
       "checkEmail": "We've sent you a confirmation email.",
       "reference": "Your reference"
+    },
+    "complete": {
+      "heading": "Complete your application",
+      "subline": "One last step to activate your energy switch.",
+      "ibanLabel": "Belgian IBAN",
+      "ibanPlaceholder": "BE68 5390 0754 7034",
+      "ibanError": "Invalid Belgian IBAN — please check the number you entered.",
+      "sepaLabel": "I authorise June Energy to collect my energy invoice from this account in accordance with the SEPA mandate.",
+      "submit": "Confirm",
+      "submitting": "Submitting…",
+      "reference": "Reference",
+      "successTitle": "Thanks — your application is complete!",
+      "successMessage": "Your energy switch will take effect in the coming weeks. The June CS team will keep you informed.",
+      "alreadyTitle": "Application already complete",
+      "alreadyMessage": "Your application has already been completed. Reference:",
+      "invalidTitle": "Invalid or expired link",
+      "invalidMessage": "This link is no longer valid. For any questions, contact us at",
+      "expiredTitle": "Link expired",
+      "expiredMessage": "This link is valid for 30 days and is no longer active. Please contact us at",
+      "contactEmail": "info@june.energy",
+      "submitError": {
+        "generic": "Something went wrong. Please try again.",
+        "network": "Check your internet connection and try again.",
+        "tooFast": "Slow down — please try again."
+      }
     }
   },
   "cms": {
