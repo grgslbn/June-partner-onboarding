@@ -4,6 +4,51 @@
 -- uuid columns accept any 32-hex string, but Zod's z.string().uuid() enforces
 -- RFC 4122 strict validation, so hand-crafted values cause 400s at the API.
 
+-- ── CMS: june_admin dev account ─────────────────────────────────────────────
+-- For LOCAL dev (`supabase db reset`): direct auth.users insert works because
+-- the local Auth container accepts it.
+--
+-- For CLOUD (june-onboarding-dev and any future env): DO NOT use direct SQL.
+-- Direct inserts into auth.users on cloud projects miss internal Supabase Auth
+-- fields (instance_id, identity rows, etc.) and cause "Database error finding
+-- user" on sign-in. Instead, run once via the Admin Auth API:
+--
+--   curl -s -X POST "${NEXT_PUBLIC_SUPABASE_URL}/auth/v1/admin/users" \
+--     -H "apikey: ${SUPABASE_SERVICE_ROLE_KEY}" \
+--     -H "Authorization: Bearer ${SUPABASE_SERVICE_ROLE_KEY}" \
+--     -H "Content-Type: application/json" \
+--     -d '{"email":"georgeslieben@gmail.com","email_confirm":true}'
+--
+-- Then insert into public.profiles with the UUID returned from that call.
+-- See docs/admin-provisioning.md (or this comment) for the one-time setup script.
+--
+-- profiles INSERT is service_role-only per RLS; inserting here directly works
+-- because seed SQL runs as the superuser, bypassing RLS.
+
+-- Local-only: direct auth.users insert (no-op on cloud since Admin API is used there)
+insert into auth.users (
+  id, instance_id, email, encrypted_password,
+  email_confirmed_at, role, aud, created_at, updated_at,
+  raw_app_meta_data, raw_user_meta_data
+)
+select
+  gen_random_uuid(),
+  '00000000-0000-0000-0000-000000000000',
+  'georgeslieben@gmail.com',
+  crypt('unused-magic-link-only', gen_salt('bf')),
+  now(), 'authenticated', 'authenticated', now(), now(),
+  '{"provider":"email","providers":["email"]}'::jsonb,
+  '{"email_verified":true}'::jsonb
+where not exists (
+  select 1 from auth.users where email = 'georgeslieben@gmail.com'
+);
+
+insert into public.profiles (id, email, role, partner_id)
+select id, 'georgeslieben@gmail.com', 'june_admin', null
+from auth.users where email = 'georgeslieben@gmail.com'
+on conflict (id) do nothing;
+
+-- ── Partner: IHPO ────────────────────────────────────────────────────────────
 delete from partners where slug = 'ihpo';
 
 with new_partner as (
