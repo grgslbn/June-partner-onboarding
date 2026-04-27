@@ -125,6 +125,19 @@ describe('SimpleForm — submit body', () => {
     expect(body.salesRepId).toBeNull();
     expect(body.tcAccepted).toBe(true);
   });
+
+  it('coerces salesRepId empty string to null (Radix controlled-reset edge case)', async () => {
+    fetchMock.mockClear();
+    const user = userEvent.setup();
+    // Simulates the case where Radix fires onValueChange('') on a controlled
+    // reset, leaving rep.id as '' instead of null.
+    await fillAndSubmit(user, { id: '' });
+
+    const [url, init] = fetchMock.mock.calls.find((args: unknown[]) => args[0] === '/api/leads') ?? [];
+    expect(url).toBe('/api/leads');
+    const body = JSON.parse((init as RequestInit).body as string);
+    expect(body.salesRepId).toBeNull();
+  });
 });
 
 describe('HeroRepPicker — controlled/uncontrolled', () => {
