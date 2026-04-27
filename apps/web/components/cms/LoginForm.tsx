@@ -3,11 +3,21 @@
 import { useState } from 'react';
 import { getSupabaseBrowserClient } from '@/lib/supabase/browser';
 
-export function LoginForm() {
+type Props = { bypassEnabled?: boolean };
+
+export function LoginForm({ bypassEnabled = false }: Props) {
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState<'idle' | 'loading' | 'sent' | 'error'>('idle');
   const [errorMsg, setErrorMsg] = useState('');
 
+  // ── Dev bypass: single button, no email needed ──────────────────────────
+  if (bypassEnabled) {
+    return (
+      <DevLoginButton />
+    );
+  }
+
+  // ── Normal magic-link flow ───────────────────────────────────────────────
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setStatus('loading');
@@ -17,9 +27,6 @@ export function LoginForm() {
     const { error } = await supabase.auth.signInWithOtp({
       email,
       options: {
-        // Must point to the deployed origin so magic links from staging/prod
-        // don't redirect to localhost. NEXT_PUBLIC_SITE_URL must be set in
-        // Vercel env vars (e.g. https://pos.june-energy.app for staging).
         emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/admin/auth/callback`,
       },
     });
@@ -74,5 +81,44 @@ export function LoginForm() {
         {status === 'loading' ? 'Sending…' : 'Send magic link'}
       </button>
     </form>
+  );
+}
+
+function DevLoginButton() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  async function handleDevLogin() {
+    setLoading(true);
+    setError('');
+
+    const res = await fetch('/api/admin/auth/dev-login', { method: 'POST' });
+
+    if (!res.ok) {
+      setLoading(false);
+      setError(`Dev login failed (${res.status})`);
+      return;
+    }
+
+    // Endpoint redirects — browser follows automatically when res.redirected.
+    // If fetch followed the redirect, navigate to the final URL.
+    if (res.redirected) {
+      window.location.href = res.url;
+    } else {
+      window.location.href = '/admin';
+    }
+  }
+
+  return (
+    <div className="space-y-3">
+      <button
+        onClick={handleDevLogin}
+        disabled={loading}
+        className="w-full rounded-md bg-amber-500 px-4 py-2 text-sm font-semibold text-white hover:bg-amber-600 disabled:opacity-50"
+      >
+        {loading ? 'Signing in…' : 'Sign in as dev admin'}
+      </button>
+      {error && <p className="text-sm text-red-600">{error}</p>}
+    </div>
   );
 }

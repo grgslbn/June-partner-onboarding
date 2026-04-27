@@ -6,5 +6,19 @@ export default async function CmsLayout({ children }: { children: ReactNode }) {
   // defence-in-depth catches any matcher misconfiguration.
   await getCurrentProfile();
 
-  return <>{children}</>;
+  const bypassActive = process.env.DEV_AUTH_BYPASS === 'true';
+
+  return (
+    <>
+      {bypassActive && (
+        <div
+          role="alert"
+          className="sticky top-0 z-50 w-full bg-amber-400 px-4 py-2 text-center text-sm font-semibold text-amber-950"
+        >
+          DEV MODE — auth bypassed. Do not enable in production.
+        </div>
+      )}
+      {children}
+    </>
+  );
 }
