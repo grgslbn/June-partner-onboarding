@@ -174,6 +174,13 @@ export type Database = {
             foreignKeyName: "events_shop_id_fkey"
             columns: ["shop_id"]
             isOneToOne: false
+            referencedRelation: "partner_rep_performance_30d"
+            referencedColumns: ["shop_id"]
+          },
+          {
+            foreignKeyName: "events_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
             referencedRelation: "shops"
             referencedColumns: ["id"]
           },
@@ -282,8 +289,22 @@ export type Database = {
             foreignKeyName: "leads_sales_rep_id_fkey"
             columns: ["sales_rep_id"]
             isOneToOne: false
+            referencedRelation: "partner_rep_performance_30d"
+            referencedColumns: ["sales_rep_id"]
+          },
+          {
+            foreignKeyName: "leads_sales_rep_id_fkey"
+            columns: ["sales_rep_id"]
+            isOneToOne: false
             referencedRelation: "sales_reps"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "leads_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "partner_rep_performance_30d"
+            referencedColumns: ["shop_id"]
           },
           {
             foreignKeyName: "leads_shop_id_fkey"
@@ -464,6 +485,13 @@ export type Database = {
             foreignKeyName: "sales_reps_shop_id_fkey"
             columns: ["shop_id"]
             isOneToOne: false
+            referencedRelation: "partner_rep_performance_30d"
+            referencedColumns: ["shop_id"]
+          },
+          {
+            foreignKeyName: "sales_reps_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
             referencedRelation: "shops"
             referencedColumns: ["id"]
           },
@@ -540,6 +568,59 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "leads_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "partners"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      partner_funnel_30d: {
+        Row: {
+          event_count: number | null
+          event_type: string | null
+          partner_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "events_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "partners"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      partner_leads_daily: {
+        Row: {
+          completed_count: number | null
+          day: string | null
+          leads_count: number | null
+          partner_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "leads_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "partners"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      partner_rep_performance_30d: {
+        Row: {
+          completed_count: number | null
+          display_name: string | null
+          leads_count: number | null
+          partner_id: string | null
+          sales_rep_id: string | null
+          shop_id: string | null
+          shop_name: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shops_partner_id_fkey"
             columns: ["partner_id"]
             isOneToOne: false
             referencedRelation: "partners"
