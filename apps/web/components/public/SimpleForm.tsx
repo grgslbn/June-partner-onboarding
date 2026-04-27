@@ -52,7 +52,7 @@ export default function SimpleForm({
     formState: { errors, isValid },
   } = useForm<SimpleLeadInput>({
     resolver: zodResolver(simpleLeadSchema),
-    mode: 'onBlur',
+    mode: 'onChange',
     defaultValues: { firstName: '', lastName: '', email: '', tcAccepted: false as unknown as true },
   });
 
