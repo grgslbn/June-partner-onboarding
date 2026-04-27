@@ -5,13 +5,14 @@ import { useRef, useCallback } from 'react';
 export type SaveState = 'idle' | 'saving' | 'saved' | 'error';
 
 type Options<T> = {
-  partnerId: string;
+  // Full path after /api/admin/ — e.g. "partners/abc" or "partners/abc/shops/xyz"
+  resourcePath: string;
   debounceMs?: number;
   onSaved: (data: T) => void;
   onStateChange: (state: SaveState) => void;
 };
 
-export function useAutosave<T>({ partnerId, debounceMs = 1500, onSaved, onStateChange }: Options<T>) {
+export function useAutosave<T>({ resourcePath, debounceMs = 1500, onSaved, onStateChange }: Options<T>) {
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const save = useCallback(
@@ -21,7 +22,7 @@ export function useAutosave<T>({ partnerId, debounceMs = 1500, onSaved, onStateC
       timerRef.current = setTimeout(async () => {
         onStateChange('saving');
         try {
-          const res = await fetch(`/api/admin/partners/${partnerId}`, {
+          const res = await fetch(`/api/admin/${resourcePath}`, {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(patch),
@@ -33,14 +34,13 @@ export function useAutosave<T>({ partnerId, debounceMs = 1500, onSaved, onStateC
           onSaved(updated as T);
           onStateChange('saved');
 
-          // Clear the "Saved" indicator after 2s
           setTimeout(() => onStateChange('idle'), 2000);
         } catch {
           onStateChange('error');
         }
       }, debounceMs);
     },
-    [partnerId, debounceMs, onSaved, onStateChange]
+    [resourcePath, debounceMs, onSaved, onStateChange]
   );
 
   return { save };

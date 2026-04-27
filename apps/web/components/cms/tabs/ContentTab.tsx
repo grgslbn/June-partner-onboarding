@@ -40,7 +40,7 @@ export function ContentTab({ partner, onSaved }: { partner: Partner; onSaved: (p
   });
 
   const { save } = useAutosave<Partner>({
-    partnerId: partner.id,
+    resourcePath: `partners/${partner.id}`,
     onSaved,
     onStateChange: setSaveState,
   });
