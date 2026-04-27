@@ -15,6 +15,13 @@
 - [ ] Supabase Auth: partner admin user provisioned via Admin Auth API (if partner_admin role needed)
 - [ ] `emailRedirectTo` for magic-link confirmed in Supabase Auth allowed-URLs list
 
+## Per-discount-code checklist
+
+- [ ] Code communicated to all relevant sales reps
+- [ ] Validity window confirmed with partner marketing
+- [ ] Max uses set to a finite number if budget-constrained
+- [ ] Test the code in the public form before sharing externally
+
 ## Per-shop checklist (before any shop's QR is printed and distributed)
 
 - [ ] Shop name, address, zip, city verified by partner

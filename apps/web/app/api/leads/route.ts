@@ -1,9 +1,60 @@
 import { NextResponse } from 'next/server';
+import type { SupabaseClient } from '@supabase/supabase-js';
 import { createServiceClient } from '@june/db';
 import { simpleLeadSubmitSchema } from '@june/shared';
 import { getCachedPartnerBySlug } from '@/lib/partner-cache';
 import { clientIp, rateLimit } from '@/lib/rate-limit';
 import { sendConfirmationEmail } from '@/lib/emails/send-confirmation';
+
+// Returns the discount_code id if the code was valid and incremented, null if dropped.
+// Never throws — the lead must succeed even if the discount increment fails.
+async function applyDiscount(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  supabase: SupabaseClient<any>,
+  partnerId: string,
+  leadId: string,
+  code: string,
+): Promise<string | null> {
+  const upperCode = code.toUpperCase();
+
+  // Re-validate inline (race protection)
+  const { data: dc } = await supabase
+    .from('discount_codes')
+    .select('id, active, valid_from, valid_to, max_uses, used_count')
+    .eq('partner_id', partnerId)
+    .eq('code', upperCode)
+    .maybeSingle();
+
+  if (!dc || !dc.active) return null;
+
+  const now = new Date();
+  if (dc.valid_from && new Date(dc.valid_from) > now) return null;
+  if (dc.valid_to   && new Date(dc.valid_to)   < now) return null;
+  if (dc.max_uses != null && dc.used_count >= dc.max_uses) return null;
+
+  // Atomic increment with exhaustion guard
+  const { data: updated } = await supabase
+    .from('discount_codes')
+    .update({ used_count: dc.used_count + 1 })
+    .eq('id', dc.id)
+    .or(`max_uses.is.null,used_count.lt.${dc.max_uses}`)
+    .select('id')
+    .single();
+
+  if (!updated) {
+    // Race: another request exhausted the code between our select and update
+    console.warn('[leads] discount race-exhausted, dropping', { code: upperCode, leadId });
+    return null;
+  }
+
+  // Stamp the discount on the lead row
+  await supabase
+    .from('leads')
+    .update({ discount_code: upperCode })
+    .eq('id', leadId);
+
+  return dc.id;
+}
 
 function generateDeferredToken(): string {
   return crypto.randomUUID().replace(/-/g, '');
@@ -110,6 +161,11 @@ export async function POST(request: Request) {
   if (insertError || !lead) {
     console.error('[leads] insert failed', insertError);
     return NextResponse.json({ error: 'insert_failed' }, { status: 500 });
+  }
+
+  // Discount: apply if provided, but never fail the lead over it
+  if (body.discountCode) {
+    await applyDiscount(supabase, partner.id, lead.id, body.discountCode);
   }
 
   const { error: eventError } = await supabase.from('events').insert({

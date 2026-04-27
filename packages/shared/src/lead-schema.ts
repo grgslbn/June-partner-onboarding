@@ -17,6 +17,7 @@ export const simpleLeadSubmitSchema = simpleLeadSchema.extend({
   salesRepId: z.string().uuid().nullable().optional(),
   locale: z.enum(['nl', 'fr', 'en']),
   honeypot: z.string().nullable().optional(),
+  discountCode: z.string().min(1).max(32).nullable().optional(),
 });
 
 export type SimpleLeadSubmit = z.infer<typeof simpleLeadSubmitSchema>;
