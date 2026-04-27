@@ -17,7 +17,7 @@ export default async function PartnerLandingPage({
 
   const { data: partner } = await supabase
     .from('partners')
-    .select('id, slug, name, logo_url, primary_color, accent_color, default_locale, locales_enabled, active, tc_url_i18n')
+    .select('id, slug, name, logo_url, primary_color, accent_color, default_locale, locales_enabled, active, tc_url_i18n, slogan_i18n, trust_badge_i18n, privacy_url_i18n')
     .eq('slug', slug)
     .maybeSingle();
 

@@ -49,10 +49,16 @@ from auth.users where email = 'georgeslieben@gmail.com'
 on conflict (id) do nothing;
 
 -- ── Partner: IHPO ────────────────────────────────────────────────────────────
-delete from partners where slug = 'ihpo';
+-- ON CONFLICT DO UPDATE makes this idempotent across resets and cloud manual runs.
+-- New columns (content_status, trust_badge_i18n, privacy_url_i18n, color variants)
+-- are included here so the IHPO row is always fully populated after seeding.
 
-with new_partner as (
-  insert into partners (slug, name, primary_color, accent_color, flow_preset, iban_behavior, locales_enabled, default_locale)
+with upserted_partner as (
+  insert into partners (
+    slug, name, primary_color, accent_color,
+    flow_preset, iban_behavior, locales_enabled, default_locale,
+    content_status, trust_badge_i18n, privacy_url_i18n
+  )
   values (
     'ihpo',
     'IHPO',
@@ -61,31 +67,56 @@ with new_partner as (
     'simple',
     'deferred',
     array['nl','fr'],
-    'fr'
+    'fr',
+    'draft',
+    '{"fr":"Certifié partenaire June","nl":"Gecertificeerd June-partner"}'::jsonb,
+    '{"fr":"https://ihpo.be/confidentialite","nl":"https://ihpo.be/privacy"}'::jsonb
   )
+  on conflict (slug) do update set
+    name               = excluded.name,
+    primary_color      = excluded.primary_color,
+    accent_color       = excluded.accent_color,
+    flow_preset        = excluded.flow_preset,
+    iban_behavior      = excluded.iban_behavior,
+    locales_enabled    = excluded.locales_enabled,
+    default_locale     = excluded.default_locale,
+    trust_badge_i18n   = excluded.trust_badge_i18n,
+    privacy_url_i18n   = excluded.privacy_url_i18n
   returning id
+),
+new_partner as (
+  -- Re-select so CTE chain works whether this was an insert or update.
+  select id from upserted_partner
 ),
 brussels as (
   insert into shops (partner_id, name, address, city, zip, qr_token)
   select id, 'IHPO Brussels Central', 'Rue Royale 1', 'Brussels', '1000', 'demo-shop-brussels'
   from new_partner
+  on conflict (qr_token) do nothing
   returning id
 ),
 antwerp as (
   insert into shops (partner_id, name, address, city, zip, qr_token)
   select id, 'IHPO Antwerp Central', 'Meir 42', 'Antwerp', '2000', 'demo-shop-antwerp'
   from new_partner
+  on conflict (qr_token) do nothing
   returning id
 ),
 liege as (
   insert into shops (partner_id, name, address, city, zip, qr_token)
   select id, 'IHPO Liège Downtown', 'Rue de la Régence 10', 'Liège', '4000', 'demo-shop-liege'
   from new_partner
+  on conflict (qr_token) do nothing
   returning id
 )
 insert into sales_reps (shop_id, display_name, email)
-select id, 'Marie Dupont',  'marie@ihpo.example' from brussels
-union all
-select id, 'Jean Martin',   'jean@ihpo.example'  from brussels
-union all
-select id, 'Lotte Jansen',  'lotte@ihpo.example' from antwerp;
+select b.id, 'Marie Dupont', 'marie@ihpo.example'
+from brussels b where not exists (select 1 from sales_reps where email = 'marie@ihpo.example');
+
+insert into sales_reps (shop_id, display_name, email)
+select b.id, 'Jean Martin', 'jean@ihpo.example'
+from brussels b where not exists (select 1 from sales_reps where email = 'jean@ihpo.example');
+
+insert into sales_reps (shop_id, display_name, email)
+select a.id, 'Lotte Jansen', 'lotte@ihpo.example'
+from antwerp a where not exists (select 1 from sales_reps where email = 'lotte@ihpo.example');
