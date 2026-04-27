@@ -94,7 +94,7 @@ export default function SimpleForm({
           ...data,
           partnerSlug: slug,
           shopToken: shop?.qr_token ?? null,
-          salesRepId: rep?.id ?? null,
+          salesRepId: rep?.id || null,
           locale,
           honeypot: hpRef.current?.value ?? '',
         }),
