@@ -4,6 +4,52 @@
 -- uuid columns accept any 32-hex string, but Zod's z.string().uuid() enforces
 -- RFC 4122 strict validation, so hand-crafted values cause 400s at the API.
 
+-- ── CMS: june_admin dev account ─────────────────────────────────────────────
+-- Provisions georgeslieben@gmail.com as june_admin so the CMS is accessible
+-- immediately after `supabase db reset`. Magic-link login only; password is
+-- irrelevant (set to a non-null dummy so the NOT NULL constraint is satisfied).
+-- email_confirmed_at = now() so no confirmation step is needed in dev.
+-- profiles INSERT is service_role-only per RLS; we insert here directly in SQL
+-- which runs as the superuser during seed, bypassing RLS.
+
+delete from public.profiles  where email = 'georgeslieben@gmail.com';
+delete from auth.users        where email = 'georgeslieben@gmail.com';
+
+with admin_user as (
+  insert into auth.users (
+    id,
+    instance_id,
+    email,
+    encrypted_password,
+    email_confirmed_at,
+    role,
+    aud,
+    created_at,
+    updated_at,
+    raw_app_meta_data,
+    raw_user_meta_data
+  )
+  values (
+    gen_random_uuid(),
+    '00000000-0000-0000-0000-000000000000',
+    'georgeslieben@gmail.com',
+    -- dummy bcrypt hash; magic-link only so password is never used
+    '$2a$10$PaswordHashPlaceholderXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+    now(),
+    'authenticated',
+    'authenticated',
+    now(),
+    now(),
+    '{"provider":"email","providers":["email"]}'::jsonb,
+    '{}'::jsonb
+  )
+  returning id
+)
+insert into public.profiles (id, email, role, partner_id)
+select id, 'georgeslieben@gmail.com', 'june_admin', null
+from admin_user;
+
+-- ── Partner: IHPO ────────────────────────────────────────────────────────────
 delete from partners where slug = 'ihpo';
 
 with new_partner as (
