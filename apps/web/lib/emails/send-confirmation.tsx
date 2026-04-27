@@ -183,9 +183,17 @@ export async function sendConfirmationEmail(
       .eq('id', leadId);
   } catch (err) {
     console.error('[send-confirmation] Resend error', err);
-    await supabase.from('email_retry_queue').insert({
-      lead_id: leadId,
-      last_error: String(err),
+    await supabase.from('email_send_queue').insert({
+      email_type:  'confirmation',
+      to_address:  lead.email,
+      subject,
+      body_html:   html,
+      body_text:   text,
+      lead_id:     leadId,
+      max_failures: 5,
+      next_retry_at: new Date(Date.now() + 5 * 60 * 1000).toISOString(),
+      last_error:  String(err),
+      failure_count: 1,
     });
   }
 }

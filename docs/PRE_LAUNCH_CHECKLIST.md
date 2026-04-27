@@ -15,6 +15,15 @@
 - [ ] Supabase Auth: partner admin user provisioned via Admin Auth API (if partner_admin role needed)
 - [ ] `emailRedirectTo` for magic-link confirmed in Supabase Auth allowed-URLs list
 
+## Daily digest pre-launch
+
+- [ ] `JUNE_CS_DIGEST_EMAIL` env var set on Railway worker
+- [ ] Per-partner `digest_partner_email` set in CMS for IHPO
+- [ ] `digests@pos.june-energy.app` verified as Resend sender
+- [ ] One real run executed manually via `pnpm --filter=worker run daily-digest`, output verified
+- [ ] Retry queue table exists and is empty (`email_send_queue` with status = 'pending')
+- [ ] Cron deployment confirmed in Railway dashboard
+
 ## Per-discount-code checklist
 
 - [ ] Code communicated to all relevant sales reps

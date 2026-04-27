@@ -89,34 +89,58 @@ export type Database = {
           },
         ]
       }
-      email_retry_queue: {
+      email_send_queue: {
         Row: {
-          attempt: number
+          attachments: Json
+          body_html: string | null
+          body_text: string | null
           created_at: string
+          email_type: string
+          failure_count: number
           id: string
           last_error: string | null
-          lead_id: string
-          next_attempt_at: string
+          lead_id: string | null
+          max_failures: number
+          next_retry_at: string
+          status: string
+          subject: string
+          to_address: string
         }
         Insert: {
-          attempt?: number
+          attachments?: Json
+          body_html?: string | null
+          body_text?: string | null
           created_at?: string
+          email_type: string
+          failure_count?: number
           id?: string
           last_error?: string | null
-          lead_id: string
-          next_attempt_at?: string
+          lead_id?: string | null
+          max_failures?: number
+          next_retry_at?: string
+          status?: string
+          subject: string
+          to_address: string
         }
         Update: {
-          attempt?: number
+          attachments?: Json
+          body_html?: string | null
+          body_text?: string | null
           created_at?: string
+          email_type?: string
+          failure_count?: number
           id?: string
           last_error?: string | null
-          lead_id?: string
-          next_attempt_at?: string
+          lead_id?: string | null
+          max_failures?: number
+          next_retry_at?: string
+          status?: string
+          subject?: string
+          to_address?: string
         }
         Relationships: [
           {
-            foreignKeyName: "email_retry_queue_lead_id_fkey"
+            foreignKeyName: "email_send_queue_lead_id_fkey"
             columns: ["lead_id"]
             isOneToOne: false
             referencedRelation: "leads"
