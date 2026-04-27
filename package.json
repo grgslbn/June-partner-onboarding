@@ -4,13 +4,17 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "seed:fake": "tsx scripts/seed-fake-leads.ts",
+    "seed:fake:clean": "tsx scripts/seed-fake-leads.ts --clean"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "packageManager": "pnpm@10.33.1",
   "devDependencies": {
+    "@supabase/supabase-js": "^2.104.0",
+    "dotenv": "^17.4.2",
     "tsx": "^4.21.0",
     "turbo": "^2.9.6"
   }
