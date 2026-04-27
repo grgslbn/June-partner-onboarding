@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
+import { createServiceClient } from '@june/db';
 import type { Database } from '@june/db';
 
 export type Profile = Database['public']['Tables']['profiles']['Row'];
@@ -9,13 +10,37 @@ export type CurrentUser = {
   profile: Profile;
 };
 
+const DEV_ADMIN_EMAIL = 'georgeslieben@gmail.com';
+
 /**
  * Returns the authenticated user and their profile row.
  * Redirects to /admin/login if there is no valid session or no profile exists.
- * Call this at the top of every CMS Server Component or Route Handler that
- * requires authentication.
+ *
+ * When DEV_AUTH_BYPASS=true (dev/staging only), skips session validation and
+ * returns the seeded june_admin profile directly via service role. Never enable
+ * DEV_AUTH_BYPASS in production.
  */
 export async function getCurrentProfile(): Promise<CurrentUser> {
+  if (process.env.DEV_AUTH_BYPASS === 'true') {
+    const service = createServiceClient();
+
+    const { data: profile, error } = await service
+      .from('profiles')
+      .select('*')
+      .eq('email', DEV_ADMIN_EMAIL)
+      .single();
+
+    if (error || !profile) {
+      // Seed not applied — fall through to normal auth so the error is visible.
+      redirect('/admin/login');
+    }
+
+    return {
+      user: { id: profile.id, email: profile.email },
+      profile,
+    };
+  }
+
   const supabase = await createSupabaseServerClient();
 
   const {
@@ -34,8 +59,6 @@ export async function getCurrentProfile(): Promise<CurrentUser> {
     .single();
 
   if (profileError || !profile) {
-    // Authenticated user has no profile — likely a direct auth.users insert
-    // without a corresponding profiles row. Treat as unauthorised.
     redirect('/admin/login');
   }
 

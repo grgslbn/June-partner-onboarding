@@ -41,6 +41,12 @@ export async function proxy(request: NextRequest) {
       }
     );
 
+    // DEV_AUTH_BYPASS skips session checks entirely for all admin routes.
+    // Only ever set this in dev/staging. Never set in production.
+    if (process.env.DEV_AUTH_BYPASS === 'true') {
+      return response;
+    }
+
     const {
       data: { user },
     } = await supabase.auth.getUser();
