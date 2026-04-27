@@ -39,6 +39,31 @@
       "message": "Uw inschrijving is ontvangen.",
       "checkEmail": "We hebben u een bevestigingsmail gestuurd.",
       "reference": "Uw referentie"
+    },
+    "complete": {
+      "heading": "Voltooi uw dossier",
+      "subline": "Nog één stap om uw leverancierswissel te activeren.",
+      "ibanLabel": "Belgisch IBAN",
+      "ibanPlaceholder": "BE68 5390 0754 7034",
+      "ibanError": "Ongeldig Belgisch IBAN — controleer het ingevoerde nummer.",
+      "sepaLabel": "Ik machtig June Energy om mijn energiefactuur van deze rekening af te schrijven conform het SEPA-mandaat.",
+      "submit": "Bevestigen",
+      "submitting": "Bezig met verzenden…",
+      "reference": "Referentie",
+      "successTitle": "Bedankt — uw dossier is afgerond!",
+      "successMessage": "Uw leverancierswissel wordt de komende weken van kracht. Het June CS-team houdt u op de hoogte.",
+      "alreadyTitle": "Dossier al afgerond",
+      "alreadyMessage": "Uw dossier is al ingevuld. Referentie:",
+      "invalidTitle": "Ongeldige of verlopen link",
+      "invalidMessage": "Deze link is niet meer geldig. Voor vragen kunt u contact met ons opnemen via",
+      "expiredTitle": "Link verlopen",
+      "expiredMessage": "Deze link is 30 dagen geldig en is niet meer actief. Neem contact op via",
+      "contactEmail": "info@june.energy",
+      "submitError": {
+        "generic": "Er is iets fout gegaan. Probeer het opnieuw.",
+        "network": "Controleer uw internetverbinding en probeer opnieuw.",
+        "tooFast": "Even rustig aan — probeer opnieuw."
+      }
     }
   },
   "cms": {

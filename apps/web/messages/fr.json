@@ -39,6 +39,31 @@
       "message": "Votre inscription a bien été reçue.",
       "checkEmail": "Nous vous avons envoyé un e-mail de confirmation.",
       "reference": "Votre référence"
+    },
+    "complete": {
+      "heading": "Finalisez votre dossier",
+      "subline": "Plus qu'une étape pour activer votre changement de fournisseur.",
+      "ibanLabel": "IBAN belge",
+      "ibanPlaceholder": "BE68 5390 0754 7034",
+      "ibanError": "IBAN belge invalide — vérifiez le numéro saisi.",
+      "sepaLabel": "J'autorise June Energy à prélever ma facture d'énergie sur ce compte conformément au mandat SEPA.",
+      "submit": "Confirmer",
+      "submitting": "Envoi en cours…",
+      "reference": "Référence",
+      "successTitle": "Merci — votre dossier est finalisé !",
+      "successMessage": "Votre changement de fournisseur sera effectif dans les semaines à venir. L'équipe June CS vous tiendra informé.",
+      "alreadyTitle": "Dossier déjà finalisé",
+      "alreadyMessage": "Votre dossier a déjà été complété. Référence :",
+      "invalidTitle": "Lien invalide ou expiré",
+      "invalidMessage": "Ce lien n'est plus valide. Pour toute question, contactez-nous à",
+      "expiredTitle": "Lien expiré",
+      "expiredMessage": "Ce lien est valable 30 jours et n'est plus actif. Contactez-nous à",
+      "contactEmail": "info@june.energy",
+      "submitError": {
+        "generic": "Une erreur s'est produite. Veuillez réessayer.",
+        "network": "Vérifiez votre connexion internet et réessayez.",
+        "tooFast": "Un instant — veuillez réessayer."
+      }
     }
   },
   "cms": {
