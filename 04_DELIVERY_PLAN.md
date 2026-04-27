@@ -122,7 +122,7 @@
 - Partner self-service CMS access (feature flag flipped for IHPO).
 - Savings simulator module + optional step in Complete flow.
 - Final copy review with IHPO.
-- Production domain setup (`onboard.june.energy`).
+- Production domain setup (TBD — staging runs on `june-energy.app`; production cutover to `onboard.june.energy` pending June confirmation).
 - DNS cutover, SSL, Resend domain verification on production.
 - Monitoring + alerting smoke test.
 - **Go-live checklist** (below).
@@ -152,7 +152,7 @@
 - [ ] All env vars set correctly on Vercel Production and Railway Production.
 - [ ] Supabase production project backed up and has point-in-time recovery enabled.
 - [ ] Resend domain verified, SPF/DKIM/DMARC green.
-- [ ] DNS for `onboard.june.energy` pointing to Vercel, SSL cert issued.
+- [ ] DNS for production domain pointing to Vercel, SSL cert issued (staging: `june-energy.app`; production: TBD, likely `onboard.june.energy`).
 - [ ] Sentry release tracking active; source maps uploaded.
 - [ ] Rate limiting live on `/api/leads`.
 - [ ] Privacy policy + T&C URLs confirmed by IHPO per locale.

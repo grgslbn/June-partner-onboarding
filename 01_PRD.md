@@ -229,7 +229,7 @@ For the IHPO pilot, we measure:
 2. **Tariff reference data for savings sim.** Can we use `GET /supplier` + `GET /city` anonymously, or does this also require auth? If auth, we need a read-only service account.
 3. **Commission model.** What % to shop, what % to rep, how is it paid? (Not needed for v1 build, but needed before go-live for the digest to carry the right info.)
 4. **Lead format for June CS.** Does June CS want a specific CSV schema, or do we design it? Target format + delivery channel (email attachment vs. SFTP vs. something else)?
-5. **Domain.** Confirm `onboard.june.energy` or pick another subdomain.
+5. **Domain.** Staging uses `june-energy.app` (Cloudflare, June Energy owned). Production domain is still open — likely `onboard.june.energy` but pending confirmation from June.
 6. **Dev credentials.** We have the dev `client_id` / `client_secret` from the API reference. Confirm these are safe to use from our backend during dev, and we need prod credentials from June before launch.
 
 ## 10. Out of scope for v1 (tracked for v2+)

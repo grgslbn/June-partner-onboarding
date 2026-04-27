@@ -33,7 +33,7 @@ Real Resend-backed confirmation email that renders per-partner Markdown copy wit
    - Builds magicLink if `deferredToken` exists: `${SITE_URL}/${locale}/complete/${deferredToken}`.
    - Renders the template via `@react-email/render`.
    - Subject: substituted `partner.confirmation_email_subject_i18n[locale]`, fallback to "Bienvenue chez June" / "Welkom bij June" / "Welcome to June".
-   - Sends via Resend, from `onboarding@onboard.june.energy` (configurable via env).
+   - Sends via Resend, from `onboarding@june-energy.app` (configurable via `RESEND_FROM_EMAIL` env; will switch to `onboarding@onboard.june.energy` when production domain confirmed).
    - On Resend error: mark `confirmation_email_sent_at` as null and write to a `email_retry_queue` table (create in this briefing's migration):
      ```sql
      create table email_retry_queue (
