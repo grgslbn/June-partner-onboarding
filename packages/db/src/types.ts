@@ -89,6 +89,41 @@ export type Database = {
           },
         ]
       }
+      email_retry_queue: {
+        Row: {
+          attempt: number
+          created_at: string
+          id: string
+          last_error: string | null
+          lead_id: string
+          next_attempt_at: string
+        }
+        Insert: {
+          attempt?: number
+          created_at?: string
+          id?: string
+          last_error?: string | null
+          lead_id: string
+          next_attempt_at?: string
+        }
+        Update: {
+          attempt?: number
+          created_at?: string
+          id?: string
+          last_error?: string | null
+          lead_id?: string
+          next_attempt_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "email_retry_queue_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       events: {
         Row: {
           created_at: string | null
