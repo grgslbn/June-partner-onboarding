@@ -1,6 +1,6 @@
 # Project Status — June × IHPO Partner POS Onboarding
 
-Last updated: 2026-04-28
+Last updated: 2026-04-29
 
 Written April 28, 2026, end of working day. Project lead: Georges Lieben. Built in collaboration with Claude (planning + review) and Claude Code (implementation, two parallel sessions).
 
@@ -18,9 +18,9 @@ What a customer experiences end-to-end today:
 2. Customer scans with their phone, lands on the partner-branded landing page in their language (FR/NL/EN auto-detect with override)
 3. Page shows: partner logo + June logo, partner colors, slogan, trust badge, then the form
 4. Rep picker pill ("Avec [Marie Dupont] ▾") shows the active reps for that shop — customer picks one (or skips)
-5. Customer fills the Simple form: first name, last name, email, T&C checkbox
+5. Customer fills the form: first name, last name, email, T&C checkbox — plus any optional fields the partner has enabled (mobile, address, business details, housing type, birth date, billing frequency, product choice, inline IBAN/SEPA). Form is single-step if no extra fields are configured, multi-step otherwise.
 6. Submit → success page with a JUN-XXXXXX confirmation reference
-7. Confirmation email arrives within seconds (FR/NL/EN partner-branded, with a "Finaliser votre dossier (IBAN)" button)
+7. Confirmation email arrives within seconds (FR/NL/EN partner-branded, with a "Finaliser votre dossier (IBAN)" button if IBAN was not collected inline)
 8. Customer clicks the button → lands on the deferred IBAN completion page (also partner-branded)
 9. Validates Belgian IBAN (mod-97 check), accepts SEPA mandate, submits
 10. Success page in-place. The lead's status is now `complete` and June CS can take over.
@@ -34,12 +34,13 @@ Lives at `https://pos.june-energy.app/admin`. Built for two roles:
 - **june_admin** — sees all partners, can edit everything, has a cross-partner analytics view
 - **partner_admin** — sees only their own partner (RLS enforced)
 
-Five distinct surfaces:
+Six distinct surfaces:
 
 - **Partners list + edit** — branding (6 color slots, logo upload), content (slogan, trust badge, email copy, T&C URLs in 3 locales), settings (flow preset, IBAN behavior, locale config), status (draft / review / live)
 - **Shops + QR generation** — CRUD for shops per partner, inline QR code rendering, three downloads per shop (SVG / PNG 1024px / A6 partner-branded printable PDF leaflet), regenerate-token flow with confirmation modal
 - **Sales reps** — CRUD per shop, single-rep create or bulk-paste import (CSV-format text, one-column or two-column auto-detect), disable-not-delete to preserve attribution history
 - **Discount codes** — CRUD per partner, public validation endpoint, atomic increment-on-use with race protection, type `fixed_eur` or `percent`
+- **Form fields** — per-field visible/required/step toggles for 9 optional field groups (mobile, address, business, housing_type, birth_date, billing_frequency, product_choice, iban, sepa_accepted); live schematic preview of step layout; product choices JSON editor. Autosaves via partner PATCH endpoint.
 - **Analytics** — top stat cards (today/week/month + deltas), date range toggle (7d/30d/90d), leads-over-time line chart, conversion funnel, top reps leaderboard, auto-refresh every 60s. Cross-partner aggregate view at `/admin/analytics` for june_admin only.
 
 Authentication: magic-link email via Supabase Auth, but currently bypassed via `DEV_AUTH_BYPASS=true` env var on staging — auto-logs in as georgeslieben@gmail.com (june_admin role) for fast iteration. Yellow banner at the top of every CMS page indicates this. **Must be disabled before production cutover.**
@@ -70,11 +71,11 @@ PostgreSQL (Supabase, Frankfurt eu-central-1), with full RLS:
 
 | Table | Purpose |
 |---|---|
-| `partners` | branding, content, flow config, `content_status` flag |
+| `partners` | branding, content, flow config, `content_status` flag, `form_schema jsonb` (field group config), `product_choices jsonb` |
 | `shops` | per partner, with stable `qr_token` (URL-safe base64) |
 | `sales_reps` | per shop, soft-disable via `active` flag |
 | `discount_codes` | per partner, atomic-increment safe |
-| `leads` | with `deferred_token` for IBAN completion, attribution to shop + rep |
+| `leads` | with `deferred_token` for IBAN completion, attribution to shop + rep; 9 optional extra-field columns (`mobile`, `is_business`, `business_name`, `business_vat`, `sepa_accepted`, `housing_type`, `birth_date`, `billing_frequency`, `product_choice`) + existing `address jsonb` / `iban` |
 | `events` | analytics-grade, tracks `landing_view` → `form_started` → `form_submitted` → `email_opened` → `deferred_completed` |
 | `profiles` | auth user roles (`june_admin` / `partner_admin`), `partner_id` scoping |
 | `email_send_queue` | unified email queue with `email_type` discriminator (`confirmation` / `digest_partner` / `digest_summary`) |
@@ -100,11 +101,15 @@ Multi-round bug fix on the Simple form rep-picker (3 PRs: form mode, rep Select 
 **Phase 5 — Operational glue (Briefing 18)**
 Worker for daily digest. Generalized the email retry queue into a unified `email_send_queue` to support multiple email types cleanly.
 
+**Phase 6 — Configurable form schema (Briefing 37)**
+`DynamicForm` replaces `SimpleForm` (shim re-export keeps all existing tests passing). Partners configure up to 9 optional field groups via `form_schema` JSONB; empty schema is byte-for-byte identical to the old form. Multi-step rendering with "X / N" counter, partner-colored "Suivant" button. CMS Form fields tab with per-field toggles + live step preview. CSV digest extended to 30 columns. Belgian postcodes auto-fill with 300 ms debounce.
+
 **Pulled forward, parallel, or descoped**
 
 - Pulled forward: CMS track (Briefings 12–17), to demo-readiness sooner
+- Pulled forward: configurable form schema (Briefing 37), to support IHPO-specific field requirements before pilot
 - Parallel: customer-flow + CMS tracks ran in two Claude Code sessions with file-scope coordination rules
-- Descoped to "after pilot": Standard form (Briefing 08), Complete preset (Briefing 09), PWA (Briefing 19), Audit log (Briefing 21), Phase 3 direct API ingest
+- Descoped to "after pilot": PWA (Briefing 19), Audit log (Briefing 21), Phase 3 direct API ingest
 
 **Open work**
 
