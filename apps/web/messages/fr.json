@@ -27,11 +27,58 @@
         "required": "Ce champ est requis",
         "email": "Veuillez saisir une adresse e-mail valide"
       },
+      "nextButton": "Suivant",
+      "prevButton": "Précédent",
       "submitError": {
         "generic": "Une erreur s'est produite. Veuillez réessayer.",
         "server": "Problème temporaire. Veuillez réessayer dans un instant.",
         "network": "Vérifiez votre connexion internet et réessayez.",
         "tooFast": "Un instant — veuillez réessayer."
+      },
+      "mobile": {
+        "label": "Numéro de téléphone mobile",
+        "placeholder": "04XX XX XX XX"
+      },
+      "address": {
+        "streetLabel": "Rue et numéro",
+        "streetPlaceholder": "Rue de la Loi 16",
+        "postalCodeLabel": "Code postal",
+        "postalCodePlaceholder": "1000",
+        "cityLabel": "Commune",
+        "cityPlaceholder": "Bruxelles"
+      },
+      "business": {
+        "toggleLabel": "Je suis une entreprise",
+        "nameLabel": "Nom de l'entreprise",
+        "namePlaceholder": "Ma Société SPRL",
+        "vatLabel": "Numéro de TVA",
+        "vatPlaceholder": "BE0123456789"
+      },
+      "housingType": {
+        "label": "Statut d'occupation",
+        "owner": "Propriétaire",
+        "tenant": "Locataire",
+        "other": "Autre"
+      },
+      "birthDate": {
+        "label": "Date de naissance"
+      },
+      "billingFrequency": {
+        "label": "Fréquence de facturation",
+        "monthly": "Mensuelle",
+        "bimonthly": "Bimestrielle",
+        "annual": "Annuelle"
+      },
+      "productChoice": {
+        "label": "Choisissez votre offre"
+      },
+      "iban": {
+        "label": "IBAN belge",
+        "placeholder": "BE68 5390 0754 7034",
+        "error": "IBAN belge invalide — vérifiez le numéro saisi."
+      },
+      "sepa": {
+        "label": "J'autorise June Energy à prélever ma facture d'énergie sur ce compte conformément au mandat SEPA."
       }
     },
     "success": {

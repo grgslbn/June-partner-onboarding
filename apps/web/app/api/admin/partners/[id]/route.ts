@@ -16,6 +16,7 @@ const ALLOWED_FIELDS = new Set([
   'digest_partner_email',
   'confirmation_email_subject_i18n', 'confirmation_email_body_i18n',
   'submission_route', 'stripe_url_template', 'stripe_promo_code', 'june_backup_email',
+  'form_schema', 'product_choices',
 ]);
 
 export async function GET(

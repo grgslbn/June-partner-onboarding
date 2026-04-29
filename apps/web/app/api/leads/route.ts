@@ -7,6 +7,8 @@ import { clientIp, rateLimit } from '@/lib/rate-limit';
 import { sendConfirmationEmail } from '@/lib/emails/send-confirmation';
 import { sendSelfOnboardingEmail } from '@/lib/emails/send-self-onboarding';
 import { sendStripeBackupEmail } from '@/lib/emails/send-stripe-backup';
+import { parseFormSchema } from '@/lib/forms/form-schema';
+import { validateFormFields } from '@/lib/forms/validate-submission';
 
 // Returns the discount_code id if the code was valid and incremented, null if dropped.
 // Never throws — the lead must succeed even if the discount increment fails.
@@ -140,6 +142,28 @@ export async function POST(request: Request) {
     }
   }
 
+  // Validate configurable fields against partner's form_schema.
+  const formSchema = parseFormSchema(partner.form_schema);
+  const missingFields = validateFormFields(formSchema, {
+    mobile:           body.mobile ?? null,
+    address:          body.address ?? null,
+    is_business:      body.is_business ?? null,
+    business_name:    body.business_name ?? null,
+    business_vat:     body.business_vat ?? null,
+    iban:             body.iban ?? null,
+    sepa_accepted:    body.sepa_accepted ?? null,
+    housing_type:     body.housing_type ?? null,
+    birth_date:       body.birth_date ?? null,
+    billing_frequency: body.billing_frequency ?? null,
+    product_choice:   body.product_choice ?? null,
+  });
+  if (missingFields.length > 0) {
+    return NextResponse.json(
+      { error: 'missing_required_fields', fields: missingFields },
+      { status: 400 },
+    );
+  }
+
   const supabase = createServiceClient();
 
   let shopId: string | null = null;
@@ -196,6 +220,18 @@ export async function POST(request: Request) {
       ip_address: safeIp(ip),
       deferred_token: deferredToken,
       promo_code: promoCode,
+      // Configurable fields — null when not collected
+      mobile:            body.mobile ?? null,
+      address:           body.address ?? null,
+      is_business:       body.is_business ?? null,
+      business_name:     body.business_name ?? null,
+      business_vat:      body.business_vat ?? null,
+      iban:              body.iban ?? null,
+      sepa_accepted:     body.sepa_accepted ?? null,
+      housing_type:      body.housing_type ?? null,
+      birth_date:        body.birth_date ?? null,
+      billing_frequency: body.billing_frequency ?? null,
+      product_choice:    body.product_choice ?? null,
     })
     .select('id, confirmation_id, deferred_token, email')
     .single();

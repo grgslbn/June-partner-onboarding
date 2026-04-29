@@ -10,7 +10,13 @@ export const simpleLeadSchema = z.object({
 
 export type SimpleLeadInput = z.infer<typeof simpleLeadSchema>;
 
-// API submit: client fields + attribution + locale + honeypot.
+const addressSchema = z.object({
+  street:      z.string().min(1).max(200),
+  postal_code: z.string().min(4).max(4).regex(/^\d{4}$/),
+  city:        z.string().min(1).max(100),
+});
+
+// API submit: client fields + attribution + locale + honeypot + configurable fields.
 export const simpleLeadSubmitSchema = simpleLeadSchema.extend({
   partnerSlug: z.string().min(1).max(80),
   shopToken: z.string().min(1).max(200).nullable().optional(),
@@ -19,6 +25,19 @@ export const simpleLeadSubmitSchema = simpleLeadSchema.extend({
   honeypot: z.string().nullable().optional(),
   discountCode: z.string().min(1).max(32).nullable().optional(),
   promoCode: z.string().min(1).max(200).nullable().optional(),
+  // Configurable form fields (all optional at schema level; server validates required-ness
+  // against partner.form_schema after parsing).
+  mobile:           z.string().min(1).max(20).nullable().optional(),
+  address:          addressSchema.nullable().optional(),
+  is_business:      z.boolean().nullable().optional(),
+  business_name:    z.string().min(1).max(200).nullable().optional(),
+  business_vat:     z.string().min(1).max(50).nullable().optional(),
+  iban:             z.string().min(1).max(34).nullable().optional(),
+  sepa_accepted:    z.boolean().nullable().optional(),
+  housing_type:     z.string().min(1).max(50).nullable().optional(),
+  birth_date:       z.string().regex(/^\d{4}-\d{2}-\d{2}$/).nullable().optional(),
+  billing_frequency: z.string().min(1).max(50).nullable().optional(),
+  product_choice:   z.string().min(1).max(200).nullable().optional(),
 });
 
 export type SimpleLeadSubmit = z.infer<typeof simpleLeadSubmitSchema>;

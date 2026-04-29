@@ -27,11 +27,58 @@
         "required": "Dit veld is verplicht",
         "email": "Gelieve een geldig e-mailadres in te voeren"
       },
+      "nextButton": "Volgende",
+      "prevButton": "Vorige",
       "submitError": {
         "generic": "Er is iets fout gegaan. Probeer het opnieuw.",
         "server": "Tijdelijke storing. Probeer het zo meteen opnieuw.",
         "network": "Controleer uw internetverbinding en probeer opnieuw.",
         "tooFast": "Even rustig aan — probeer opnieuw."
+      },
+      "mobile": {
+        "label": "Mobiel telefoonnummer",
+        "placeholder": "04XX XX XX XX"
+      },
+      "address": {
+        "streetLabel": "Straat en huisnummer",
+        "streetPlaceholder": "Wetstraat 16",
+        "postalCodeLabel": "Postcode",
+        "postalCodePlaceholder": "1000",
+        "cityLabel": "Gemeente",
+        "cityPlaceholder": "Brussel"
+      },
+      "business": {
+        "toggleLabel": "Ik ben een bedrijf",
+        "nameLabel": "Bedrijfsnaam",
+        "namePlaceholder": "Mijn Bedrijf BV",
+        "vatLabel": "BTW-nummer",
+        "vatPlaceholder": "BE0123456789"
+      },
+      "housingType": {
+        "label": "Woonstatus",
+        "owner": "Eigenaar",
+        "tenant": "Huurder",
+        "other": "Andere"
+      },
+      "birthDate": {
+        "label": "Geboortedatum"
+      },
+      "billingFrequency": {
+        "label": "Facturatiefrequentie",
+        "monthly": "Maandelijks",
+        "bimonthly": "Tweemaandelijks",
+        "annual": "Jaarlijks"
+      },
+      "productChoice": {
+        "label": "Kies uw aanbod"
+      },
+      "iban": {
+        "label": "Belgisch IBAN",
+        "placeholder": "BE68 5390 0754 7034",
+        "error": "Ongeldig Belgisch IBAN — controleer het ingevoerde nummer."
+      },
+      "sepa": {
+        "label": "Ik machtig June Energy om mijn energiefactuur van deze rekening af te schrijven conform het SEPA-mandaat."
       }
     },
     "success": {
