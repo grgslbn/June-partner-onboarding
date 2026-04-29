@@ -5,6 +5,8 @@ import { simpleLeadSubmitSchema } from '@june/shared';
 import { getCachedPartnerBySlug } from '@/lib/partner-cache';
 import { clientIp, rateLimit } from '@/lib/rate-limit';
 import { sendConfirmationEmail } from '@/lib/emails/send-confirmation';
+import { sendSelfOnboardingEmail } from '@/lib/emails/send-self-onboarding';
+import { sendStripeBackupEmail } from '@/lib/emails/send-stripe-backup';
 
 // Returns the discount_code id if the code was valid and incremented, null if dropped.
 // Never throws — the lead must succeed even if the discount increment fails.
@@ -66,6 +68,21 @@ function safeIp(raw: string): string | null {
   return null;
 }
 
+// Builds the Stripe checkout URL with the three allowed prefill params.
+// Only adds prefilled_promo_code when promo is non-empty — never passes empty string.
+function buildStripeUrl(
+  template: string,
+  email: string,
+  promo: string | null,
+  locale: string,
+): string {
+  const url = new URL(template);
+  url.searchParams.set('prefilled_email', email);
+  if (promo) url.searchParams.set('prefilled_promo_code', promo);
+  url.searchParams.set('locale', locale);
+  return url.toString();
+}
+
 export async function POST(request: Request) {
   let parsed;
   try {
@@ -101,6 +118,26 @@ export async function POST(request: Request) {
   }
   if (partner.flow_preset !== 'simple') {
     return NextResponse.json({ error: 'preset_not_supported' }, { status: 400 });
+  }
+
+  // Pre-flight config check: Stripe routes require both june_backup_email and
+  // stripe_url_template. Fail before inserting the lead so nothing is half-created.
+  const route = partner.submission_route ?? 'cs_handoff';
+  if (route !== 'cs_handoff') {
+    if (!partner.june_backup_email) {
+      console.error('[leads] june_backup_email not configured', { partnerId: partner.id, route });
+      return NextResponse.json(
+        { error: 'partner_config_error', message: 'june_backup_email not configured for this submission route' },
+        { status: 500 },
+      );
+    }
+    if (!partner.stripe_url_template) {
+      console.error('[leads] stripe_url_template not configured', { partnerId: partner.id, route });
+      return NextResponse.json(
+        { error: 'partner_config_error', message: 'stripe_url_template not configured for this submission route' },
+        { status: 500 },
+      );
+    }
   }
 
   const supabase = createServiceClient();
@@ -139,6 +176,10 @@ export async function POST(request: Request) {
   const deferredToken =
     partner.iban_behavior === 'deferred' ? generateDeferredToken() : null;
 
+  // Promo code: URL param (body.promoCode) wins; stored on the lead as-is.
+  // The resolved promo for Stripe (body param OR partner default) is computed below.
+  const promoCode = body.promoCode ?? null;
+
   const { data: lead, error: insertError } = await supabase
     .from('leads')
     .insert({
@@ -154,8 +195,9 @@ export async function POST(request: Request) {
       user_agent: request.headers.get('user-agent'),
       ip_address: safeIp(ip),
       deferred_token: deferredToken,
+      promo_code: promoCode,
     })
-    .select('id, confirmation_id, deferred_token')
+    .select('id, confirmation_id, deferred_token, email')
     .single();
 
   if (insertError || !lead) {
@@ -179,12 +221,45 @@ export async function POST(request: Request) {
     console.error('[leads] form_submitted event insert failed', eventError);
   }
 
-  await sendConfirmationEmail(lead.id, partner.id);
+  // ── Route dispatch ────────────────────────────────────────────────────────
 
+  if (route === 'cs_handoff') {
+    await sendConfirmationEmail(lead.id, partner.id);
+    return NextResponse.json(
+      { confirmationId: lead.confirmation_id, deferredToken: lead.deferred_token ?? null },
+      { status: 200 },
+    );
+  }
+
+  // Stripe routes: resolve final promo (URL param wins, then partner default)
+  const resolvedPromo = promoCode || partner.stripe_promo_code || null;
+  const stripeUrl = buildStripeUrl(
+    partner.stripe_url_template!,
+    lead.email!,
+    resolvedPromo,
+    body.locale,
+  );
+
+  // Backup notification goes to june_backup_email regardless of which Stripe route.
+  // Fire-and-forget: don't let a backup email failure block the customer response.
+  sendStripeBackupEmail(lead.id, stripeUrl).catch((err) => {
+    console.error('[leads] sendStripeBackupEmail failed', err);
+  });
+
+  if (route === 'self_onboarding') {
+    await sendSelfOnboardingEmail(lead.id, stripeUrl);
+    return NextResponse.json(
+      { confirmationId: lead.confirmation_id, deferredToken: lead.deferred_token ?? null },
+      { status: 200 },
+    );
+  }
+
+  // route === 'in_shop_stripe': client handles the redirect immediately
   return NextResponse.json(
     {
       confirmationId: lead.confirmation_id,
       deferredToken: lead.deferred_token ?? null,
+      redirectUrl: stripeUrl,
     },
     { status: 200 },
   );

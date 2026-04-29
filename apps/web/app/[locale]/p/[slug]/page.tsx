@@ -8,10 +8,10 @@ export default async function PartnerLandingPage({
   searchParams,
 }: {
   params: Promise<{ locale: string; slug: string }>;
-  searchParams: Promise<{ shop?: string }>;
+  searchParams: Promise<{ shop?: string; promo?: string }>;
 }) {
   const { locale, slug } = await params;
-  const { shop: shopToken } = await searchParams;
+  const { shop: shopToken, promo: promoCode } = await searchParams;
 
   const supabase = createServiceClient();
 
@@ -67,6 +67,7 @@ export default async function PartnerLandingPage({
       reps={reps}
       locale={locale as Locale}
       slug={slug}
+      promoCode={promoCode ?? null}
     />
   );
 }

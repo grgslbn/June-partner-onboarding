@@ -31,12 +31,14 @@ export default function SimpleForm({
   rep,
   locale,
   slug,
+  promoCode,
 }: {
   partner: Partner;
   shop: Shop | null;
   rep: Rep | null;
   locale: Locale;
   slug: string;
+  promoCode: string | null;
 }) {
   const router = useRouter();
   const t = useTranslations('public.form');
@@ -97,6 +99,7 @@ export default function SimpleForm({
           salesRepId: rep?.id || null,
           locale,
           honeypot: hpRef.current?.value ?? '',
+          promoCode: promoCode ?? null,
         }),
       });
       if (!res.ok) {
@@ -105,7 +108,11 @@ export default function SimpleForm({
         );
         return;
       }
-      const body: { confirmationId?: string } = await res.json().catch(() => ({}));
+      const body: { confirmationId?: string; redirectUrl?: string } = await res.json().catch(() => ({}));
+      if (body.redirectUrl) {
+        window.location.href = body.redirectUrl;
+        return;
+      }
       const confirmationId = body.confirmationId ?? '';
       router.push(`/${locale}/p/${slug}/done?ref=${encodeURIComponent(confirmationId)}`);
     } catch {

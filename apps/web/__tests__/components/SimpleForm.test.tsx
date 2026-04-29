@@ -32,7 +32,7 @@ async function fillAndSubmit(user: ReturnType<typeof userEvent.setup>, rep: { id
   // Advance time past MIN_FILL_MS (1500ms) so the bot-speed guard doesn't fire.
   vi.useFakeTimers({ now: Date.now() - 2000 });
   render(
-    <SimpleForm partner={PARTNER} shop={SHOP} rep={rep} locale="fr" slug="ihpo" />,
+    <SimpleForm partner={PARTNER} shop={SHOP} rep={rep} locale="fr" slug="ihpo" promoCode={null} />,
   );
   vi.useRealTimers();
   await user.type(screen.getByLabelText(/firstName/i), 'Alice');
@@ -46,7 +46,7 @@ async function fillAndSubmit(user: ReturnType<typeof userEvent.setup>, rep: { id
 describe('SimpleForm — T&C checkbox / submit button integration', () => {
   it('submit button is disabled when form is empty', async () => {
     render(
-      <SimpleForm partner={PARTNER} shop={SHOP} rep={null} locale="fr" slug="ihpo" />,
+      <SimpleForm partner={PARTNER} shop={SHOP} rep={null} locale="fr" slug="ihpo" promoCode={null} />,
     );
     expect(screen.getByRole('button', { name: /submitButton/i })).toBeDisabled();
   });
@@ -54,7 +54,7 @@ describe('SimpleForm — T&C checkbox / submit button integration', () => {
   it('submit button enables immediately after filling all fields and ticking checkbox once', async () => {
     const user = userEvent.setup();
     render(
-      <SimpleForm partner={PARTNER} shop={SHOP} rep={null} locale="fr" slug="ihpo" />,
+      <SimpleForm partner={PARTNER} shop={SHOP} rep={null} locale="fr" slug="ihpo" promoCode={null} />,
     );
 
     await user.type(screen.getByLabelText(/firstName/i), 'Alice');
@@ -70,7 +70,7 @@ describe('SimpleForm — T&C checkbox / submit button integration', () => {
   it('submit button disables again when checkbox is unticked', async () => {
     const user = userEvent.setup();
     render(
-      <SimpleForm partner={PARTNER} shop={SHOP} rep={null} locale="fr" slug="ihpo" />,
+      <SimpleForm partner={PARTNER} shop={SHOP} rep={null} locale="fr" slug="ihpo" promoCode={null} />,
     );
 
     await user.type(screen.getByLabelText(/firstName/i), 'Alice');
@@ -88,7 +88,7 @@ describe('SimpleForm — T&C checkbox / submit button integration', () => {
   it('button enables on first checkbox tick when a rep is pre-selected', async () => {
     const user = userEvent.setup();
     render(
-      <SimpleForm partner={PARTNER} shop={SHOP} rep={{ id: REP_ID }} locale="fr" slug="ihpo" />,
+      <SimpleForm partner={PARTNER} shop={SHOP} rep={{ id: REP_ID }} locale="fr" slug="ihpo" promoCode={null} />,
     );
 
     await user.type(screen.getByLabelText(/firstName/i), 'Alice');

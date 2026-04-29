@@ -1,6 +1,6 @@
 import { supabase } from './supabase.js';
 
-type EmailType = 'confirmation' | 'digest_partner' | 'digest_summary';
+type EmailType = 'confirmation' | 'digest_partner' | 'digest_summary' | 'stripe_redirect_backup';
 
 type QueueEntry = {
   email_type: EmailType;

@@ -233,6 +233,7 @@ export type Database = {
           locale: string
           partner_id: string
           phone: string | null
+          promo_code: string | null
           referrer: string | null
           sales_rep_id: string | null
           shop_id: string | null
@@ -263,6 +264,7 @@ export type Database = {
           locale: string
           partner_id: string
           phone?: string | null
+          promo_code?: string | null
           referrer?: string | null
           sales_rep_id?: string | null
           shop_id?: string | null
@@ -293,6 +295,7 @@ export type Database = {
           locale?: string
           partner_id?: string
           phone?: string | null
+          promo_code?: string | null
           referrer?: string | null
           sales_rep_id?: string | null
           shop_id?: string | null
@@ -360,9 +363,13 @@ export type Database = {
           primary_color: string
           privacy_url_i18n: Json
           product_sold: string
+          june_backup_email: string | null
           savings_sim_enabled: boolean
           slogan_i18n: Json
           slug: string
+          stripe_promo_code: string | null
+          stripe_url_template: string | null
+          submission_route: string
           success_color: string | null
           tc_url_i18n: Json
           tertiary_color: string | null
@@ -382,6 +389,7 @@ export type Database = {
           flow_preset?: string
           iban_behavior?: string
           id?: string
+          june_backup_email?: string | null
           locales_enabled?: string[]
           logo_url?: string | null
           muted_text_color?: string | null
@@ -392,6 +400,9 @@ export type Database = {
           savings_sim_enabled?: boolean
           slogan_i18n?: Json
           slug: string
+          stripe_promo_code?: string | null
+          stripe_url_template?: string | null
+          submission_route?: string
           success_color?: string | null
           tc_url_i18n?: Json
           tertiary_color?: string | null
@@ -411,6 +422,7 @@ export type Database = {
           flow_preset?: string
           iban_behavior?: string
           id?: string
+          june_backup_email?: string | null
           locales_enabled?: string[]
           logo_url?: string | null
           muted_text_color?: string | null
@@ -421,6 +433,9 @@ export type Database = {
           savings_sim_enabled?: boolean
           slogan_i18n?: Json
           slug?: string
+          stripe_promo_code?: string | null
+          stripe_url_template?: string | null
+          submission_route?: string
           success_color?: string | null
           tc_url_i18n?: Json
           tertiary_color?: string | null
