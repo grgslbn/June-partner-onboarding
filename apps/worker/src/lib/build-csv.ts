@@ -19,6 +19,19 @@ export type LeadRow = {
   deferred_completed_at: string | null;
   discount_code: string | null;
   flow_preset: string | null;
+  // Configurable form fields (null when not collected for this partner)
+  mobile: string | null;
+  address_street: string | null;
+  address_postal_code: string | null;
+  address_city: string | null;
+  is_business: string | null;
+  business_name: string | null;
+  business_vat: string | null;
+  sepa_accepted: string | null;
+  housing_type: string | null;
+  birth_date: string | null;
+  billing_frequency: string | null;
+  product_choice: string | null;
 };
 
 const HEADERS: (keyof LeadRow)[] = [
@@ -40,6 +53,18 @@ const HEADERS: (keyof LeadRow)[] = [
   'deferred_completed_at',
   'discount_code',
   'flow_preset',
+  'mobile',
+  'address_street',
+  'address_postal_code',
+  'address_city',
+  'is_business',
+  'business_name',
+  'business_vat',
+  'sepa_accepted',
+  'housing_type',
+  'birth_date',
+  'billing_frequency',
+  'product_choice',
 ];
 
 export function buildCsv(rows: LeadRow[]): Buffer {

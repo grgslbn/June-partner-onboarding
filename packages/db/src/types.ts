@@ -213,6 +213,10 @@ export type Database = {
       leads: {
         Row: {
           address: Json | null
+          billing_frequency: string | null
+          birth_date: string | null
+          business_name: string | null
+          business_vat: string | null
           complete_flow_data: Json | null
           confirmation_email_opened_at: string | null
           confirmation_email_sent_at: string | null
@@ -223,19 +227,24 @@ export type Database = {
           discount_code: string | null
           email: string
           first_name: string
+          housing_type: string | null
           iban: string | null
           id: string
           ip_address: unknown
+          is_business: boolean | null
           june_contract_id: number | null
           june_synced_at: string | null
           landing_url: string | null
           last_name: string
           locale: string
+          mobile: string | null
           partner_id: string
           phone: string | null
+          product_choice: string | null
           promo_code: string | null
           referrer: string | null
           sales_rep_id: string | null
+          sepa_accepted: boolean | null
           shop_id: string | null
           status: string
           tc_accepted_at: string
@@ -244,6 +253,10 @@ export type Database = {
         }
         Insert: {
           address?: Json | null
+          billing_frequency?: string | null
+          birth_date?: string | null
+          business_name?: string | null
+          business_vat?: string | null
           complete_flow_data?: Json | null
           confirmation_email_opened_at?: string | null
           confirmation_email_sent_at?: string | null
@@ -254,19 +267,24 @@ export type Database = {
           discount_code?: string | null
           email: string
           first_name: string
+          housing_type?: string | null
           iban?: string | null
           id?: string
           ip_address?: unknown
+          is_business?: boolean | null
           june_contract_id?: number | null
           june_synced_at?: string | null
           landing_url?: string | null
           last_name: string
           locale: string
+          mobile?: string | null
           partner_id: string
           phone?: string | null
+          product_choice?: string | null
           promo_code?: string | null
           referrer?: string | null
           sales_rep_id?: string | null
+          sepa_accepted?: boolean | null
           shop_id?: string | null
           status?: string
           tc_accepted_at: string
@@ -275,6 +293,10 @@ export type Database = {
         }
         Update: {
           address?: Json | null
+          billing_frequency?: string | null
+          birth_date?: string | null
+          business_name?: string | null
+          business_vat?: string | null
           complete_flow_data?: Json | null
           confirmation_email_opened_at?: string | null
           confirmation_email_sent_at?: string | null
@@ -285,19 +307,24 @@ export type Database = {
           discount_code?: string | null
           email?: string
           first_name?: string
+          housing_type?: string | null
           iban?: string | null
           id?: string
           ip_address?: unknown
+          is_business?: boolean | null
           june_contract_id?: number | null
           june_synced_at?: string | null
           landing_url?: string | null
           last_name?: string
           locale?: string
+          mobile?: string | null
           partner_id?: string
           phone?: string | null
+          product_choice?: string | null
           promo_code?: string | null
           referrer?: string | null
           sales_rep_id?: string | null
+          sepa_accepted?: boolean | null
           shop_id?: string | null
           status?: string
           tc_accepted_at?: string
@@ -354,16 +381,18 @@ export type Database = {
           default_locale: string
           digest_partner_email: string | null
           flow_preset: string
+          form_schema: Json
           iban_behavior: string
           id: string
+          june_backup_email: string | null
           locales_enabled: string[]
           logo_url: string | null
           muted_text_color: string | null
           name: string
           primary_color: string
           privacy_url_i18n: Json
+          product_choices: Json | null
           product_sold: string
-          june_backup_email: string | null
           savings_sim_enabled: boolean
           slogan_i18n: Json
           slug: string
@@ -387,6 +416,7 @@ export type Database = {
           default_locale?: string
           digest_partner_email?: string | null
           flow_preset?: string
+          form_schema?: Json
           iban_behavior?: string
           id?: string
           june_backup_email?: string | null
@@ -396,6 +426,7 @@ export type Database = {
           name: string
           primary_color?: string
           privacy_url_i18n?: Json
+          product_choices?: Json | null
           product_sold?: string
           savings_sim_enabled?: boolean
           slogan_i18n?: Json
@@ -420,6 +451,7 @@ export type Database = {
           default_locale?: string
           digest_partner_email?: string | null
           flow_preset?: string
+          form_schema?: Json
           iban_behavior?: string
           id?: string
           june_backup_email?: string | null
@@ -429,6 +461,7 @@ export type Database = {
           name?: string
           primary_color?: string
           privacy_url_i18n?: Json
+          product_choices?: Json | null
           product_sold?: string
           savings_sim_enabled?: boolean
           slogan_i18n?: Json

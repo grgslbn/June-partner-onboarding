@@ -19,6 +19,8 @@ type PartnerRow = {
   stripe_url_template: string | null;
   stripe_promo_code: string | null;
   june_backup_email: string | null;
+  form_schema: Record<string, unknown>;
+  product_choices: unknown[] | null;
 };
 
 type CacheEntry = { partner: PartnerRow | null; fetchedAt: number };
@@ -34,7 +36,7 @@ export async function getCachedPartnerBySlug(slug: string): Promise<PartnerRow |
   const supabase = createServiceClient();
   const { data } = await supabase
     .from('partners')
-    .select('id, slug, name, active, flow_preset, iban_behavior, locales_enabled, default_locale, tc_url_i18n, content_status, submission_route, stripe_url_template, stripe_promo_code, june_backup_email')
+    .select('id, slug, name, active, flow_preset, iban_behavior, locales_enabled, default_locale, tc_url_i18n, content_status, submission_route, stripe_url_template, stripe_promo_code, june_backup_email, form_schema, product_choices')
     .eq('slug', slug)
     .maybeSingle();
 

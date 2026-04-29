@@ -5,16 +5,18 @@ import Link from 'next/link';
 import type { Database } from '@june/db';
 import { BrandingTab } from './tabs/BrandingTab';
 import { ContentTab } from './tabs/ContentTab';
+import { FormFieldsTab } from './tabs/FormFieldsTab';
 import { SettingsTab } from './tabs/SettingsTab';
 import { LogoTab } from './tabs/LogoTab';
 
 export type Partner = Database['public']['Tables']['partners']['Row'];
 
-type Tab = 'branding' | 'content' | 'settings' | 'logo';
+type Tab = 'branding' | 'content' | 'form_fields' | 'settings' | 'logo';
 
 const TABS: { id: Tab; label: string }[] = [
   { id: 'branding', label: 'Branding' },
   { id: 'content', label: 'Content' },
+  { id: 'form_fields', label: 'Form fields' },
   { id: 'settings', label: 'Settings' },
   { id: 'logo', label: 'Logo' },
 ];
@@ -115,6 +117,9 @@ export function PartnerEditShell({ partner }: { partner: Partner }) {
         )}
         {activeTab === 'content' && (
           <ContentTab partner={currentPartner} onSaved={handleSaved} />
+        )}
+        {activeTab === 'form_fields' && (
+          <FormFieldsTab partner={currentPartner} onSaved={handleSaved} />
         )}
         {activeTab === 'settings' && (
           <SettingsTab partner={currentPartner} onSaved={handleSaved} />

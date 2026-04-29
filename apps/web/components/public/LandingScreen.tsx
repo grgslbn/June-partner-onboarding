@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import type { Locale } from '@june/shared';
 import HeroRepPicker from '@/components/public/HeroRepPicker';
-import SimpleForm from '@/components/public/SimpleForm';
+import DynamicForm from '@/components/public/DynamicForm';
 
 type Partner = {
   id: string;
@@ -14,6 +14,8 @@ type Partner = {
   foregroundColor: '#000000' | '#FFFFFF';
   tcUrl: string | null;
 };
+
+type ProductChoice = { id: string; label_i18n: Record<string, string> };
 
 type Shop = { id: string; name: string; qr_token: string };
 type Rep = { id: string; display_name: string };
@@ -25,6 +27,8 @@ export default function LandingScreen({
   locale,
   slug,
   promoCode,
+  formSchema,
+  productChoices,
 }: {
   partner: Partner;
   shop: Shop | null;
@@ -32,6 +36,8 @@ export default function LandingScreen({
   locale: Locale;
   slug: string;
   promoCode: string | null;
+  formSchema?: unknown;
+  productChoices?: ProductChoice[] | null;
 }) {
   const tLanding = useTranslations('public.landing');
   const tForm = useTranslations('public.form');
@@ -153,13 +159,15 @@ export default function LandingScreen({
           <p className="mt-1 text-sm text-neutral-500">{tForm('formCardSubline')}</p>
         </div>
 
-        <SimpleForm
-          partner={{ id: partner.id, name: partner.name, tcUrl: partner.tcUrl }}
+        <DynamicForm
+          partner={{ id: partner.id, name: partner.name, primaryColor: partner.primaryColor, tcUrl: partner.tcUrl }}
           shop={shop ? { id: shop.id, qr_token: shop.qr_token } : null}
           rep={rep}
           locale={locale}
           slug={slug}
           promoCode={promoCode}
+          formSchema={formSchema}
+          productChoices={productChoices}
         />
 
         <p className="text-center text-xs text-neutral-500">

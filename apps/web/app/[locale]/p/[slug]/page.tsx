@@ -17,7 +17,7 @@ export default async function PartnerLandingPage({
 
   const { data: partner } = await supabase
     .from('partners')
-    .select('id, slug, name, logo_url, primary_color, accent_color, default_locale, locales_enabled, active, tc_url_i18n, slogan_i18n, trust_badge_i18n, privacy_url_i18n')
+    .select('id, slug, name, logo_url, primary_color, accent_color, default_locale, locales_enabled, active, tc_url_i18n, slogan_i18n, trust_badge_i18n, privacy_url_i18n, form_schema, product_choices')
     .eq('slug', slug)
     .maybeSingle();
 
@@ -68,6 +68,9 @@ export default async function PartnerLandingPage({
       locale={locale as Locale}
       slug={slug}
       promoCode={promoCode ?? null}
+      formSchema={partner.form_schema ?? undefined}
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      productChoices={(partner.product_choices as any) ?? null}
     />
   );
 }

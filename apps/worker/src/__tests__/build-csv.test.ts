@@ -20,6 +20,18 @@ const sample: LeadRow = {
   deferred_completed_at: null,
   discount_code:        null,
   flow_preset:          'simple',
+  mobile:               null,
+  address_street:       null,
+  address_postal_code:  null,
+  address_city:         null,
+  is_business:          null,
+  business_name:        null,
+  business_vat:         null,
+  sepa_accepted:        null,
+  housing_type:         null,
+  birth_date:           null,
+  billing_frequency:    null,
+  product_choice:       null,
 };
 
 test('buildCsv returns a Buffer starting with UTF-8 BOM', () => {
@@ -30,7 +42,7 @@ test('buildCsv returns a Buffer starting with UTF-8 BOM', () => {
   expect(buf[2]).toBe(0xbf);
 });
 
-test('buildCsv includes header row with all 18 columns in order', () => {
+test('buildCsv includes header row with all 30 columns in order', () => {
   const buf = buildCsv([sample]);
   // Strip BOM (U+FEFF) before comparing
   const text = buf.toString('utf8').replace(/^﻿/, '');
@@ -38,7 +50,9 @@ test('buildCsv includes header row with all 18 columns in order', () => {
   expect(firstLine).toBe(
     'confirmation_id,created_at_utc,created_at_brussels,partner_slug,partner_name,' +
     'shop_name,shop_qr_token,sales_rep_name,sales_rep_email,first_name,last_name,' +
-    'email,locale,status,iban,deferred_completed_at,discount_code,flow_preset',
+    'email,locale,status,iban,deferred_completed_at,discount_code,flow_preset,' +
+    'mobile,address_street,address_postal_code,address_city,is_business,business_name,' +
+    'business_vat,sepa_accepted,housing_type,birth_date,billing_frequency,product_choice',
   );
 });
 
@@ -55,8 +69,9 @@ test('buildCsv emits empty string for null fields', () => {
   const lines = text.trimEnd().split('\n');
   const dataLine = lines[1]!;
   // iban, deferred_completed_at, discount_code are null — should appear as empty fields
-  // Row ends with: ...,fr,submitted,,,, (iban, deferred, discount empty, flow_preset last)
-  expect(dataLine).toContain(',fr,submitted,,,,simple');
+  expect(dataLine).toContain(',fr,submitted,,,,simple,');
+  // All 12 new configurable fields are null — row ends with 12 commas
+  expect(dataLine.endsWith(','.repeat(11))).toBe(true);
 });
 
 test('buildCsv handles empty rows array', () => {
