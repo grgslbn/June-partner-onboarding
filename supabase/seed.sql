@@ -57,7 +57,8 @@ with upserted_partner as (
   insert into partners (
     slug, name, primary_color, accent_color,
     flow_preset, iban_behavior, locales_enabled, default_locale,
-    content_status, trust_badge_i18n, privacy_url_i18n
+    content_status, trust_badge_i18n, privacy_url_i18n,
+    submission_route, stripe_url_template, stripe_promo_code, june_backup_email
   )
   values (
     'ihpo',
@@ -70,18 +71,26 @@ with upserted_partner as (
     'fr',
     'draft',
     '{"fr":"Certifié partenaire June","nl":"Gecertificeerd June-partner"}'::jsonb,
-    '{"fr":"https://ihpo.be/confidentialite","nl":"https://ihpo.be/privacy"}'::jsonb
+    '{"fr":"https://ihpo.be/confidentialite","nl":"https://ihpo.be/privacy"}'::jsonb,
+    'in_shop_stripe',
+    'https://billing.june.energy/b/9AQ8xf0yx6nG0la28i',
+    'POSSHOPBRAINE',
+    'TODO@june.energy'
   )
   on conflict (slug) do update set
-    name               = excluded.name,
-    primary_color      = excluded.primary_color,
-    accent_color       = excluded.accent_color,
-    flow_preset        = excluded.flow_preset,
-    iban_behavior      = excluded.iban_behavior,
-    locales_enabled    = excluded.locales_enabled,
-    default_locale     = excluded.default_locale,
-    trust_badge_i18n   = excluded.trust_badge_i18n,
-    privacy_url_i18n   = excluded.privacy_url_i18n
+    name                 = excluded.name,
+    primary_color        = excluded.primary_color,
+    accent_color         = excluded.accent_color,
+    flow_preset          = excluded.flow_preset,
+    iban_behavior        = excluded.iban_behavior,
+    locales_enabled      = excluded.locales_enabled,
+    default_locale       = excluded.default_locale,
+    trust_badge_i18n     = excluded.trust_badge_i18n,
+    privacy_url_i18n     = excluded.privacy_url_i18n,
+    submission_route     = excluded.submission_route,
+    stripe_url_template  = excluded.stripe_url_template,
+    stripe_promo_code    = excluded.stripe_promo_code,
+    june_backup_email    = excluded.june_backup_email
   returning id
 ),
 new_partner as (

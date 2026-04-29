@@ -24,12 +24,14 @@ export default function LandingScreen({
   reps,
   locale,
   slug,
+  promoCode,
 }: {
   partner: Partner;
   shop: Shop | null;
   reps: Rep[];
   locale: Locale;
   slug: string;
+  promoCode: string | null;
 }) {
   const tLanding = useTranslations('public.landing');
   const tForm = useTranslations('public.form');
@@ -157,6 +159,7 @@ export default function LandingScreen({
           rep={rep}
           locale={locale}
           slug={slug}
+          promoCode={promoCode}
         />
 
         <p className="text-center text-xs text-neutral-500">
