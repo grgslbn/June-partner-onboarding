@@ -23,10 +23,10 @@ export function BrandingTab({ partner, onSaved }: { partner: Partner; onSaved: (
     defaultValues: {
       primary_color:    partner.primary_color ?? '#E53935',
       accent_color:     partner.accent_color ?? '#FFFFFF',
-      tertiary_color:   partner.tertiary_color ?? '',
-      success_color:    partner.success_color ?? '',
-      danger_color:     partner.danger_color ?? '',
-      muted_text_color: partner.muted_text_color ?? '',
+      tertiary_color:   partner.tertiary_color ?? '#000000',
+      success_color:    partner.success_color ?? '#16A34A',
+      danger_color:     partner.danger_color ?? '#DC2626',
+      muted_text_color: partner.muted_text_color ?? '#6B7280',
     },
   });
 
@@ -40,13 +40,14 @@ export function BrandingTab({ partner, onSaved }: { partner: Partner; onSaved: (
 
   // Autosave on any field change
   useEffect(() => {
-    const patch: Record<string, unknown> = {};
-    if (values.primary_color)    patch.primary_color    = values.primary_color;
-    if (values.accent_color)     patch.accent_color     = values.accent_color;
-    if (values.tertiary_color)   patch.tertiary_color   = values.tertiary_color || null;
-    if (values.success_color)    patch.success_color    = values.success_color || null;
-    if (values.danger_color)     patch.danger_color     = values.danger_color || null;
-    if (values.muted_text_color) patch.muted_text_color = values.muted_text_color || null;
+    const patch: Record<string, unknown> = {
+      primary_color:    values.primary_color    || '#E53935',
+      accent_color:     values.accent_color     || '#FFFFFF',
+      tertiary_color:   values.tertiary_color   || null,
+      success_color:    values.success_color    || null,
+      danger_color:     values.danger_color     || null,
+      muted_text_color: values.muted_text_color || null,
+    };
     save(patch);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [values.primary_color, values.accent_color, values.tertiary_color, values.success_color, values.danger_color, values.muted_text_color]);
