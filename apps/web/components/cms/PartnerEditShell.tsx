@@ -72,6 +72,12 @@ export function PartnerEditShell({ partner }: { partner: Partner }) {
           </div>
           <div className="flex items-center gap-4">
             <Link
+              href={`/admin/partners/${currentPartner.id}/leads`}
+              className="text-sm font-medium text-blue-600 hover:text-blue-800"
+            >
+              Leads →
+            </Link>
+            <Link
               href={`/admin/partners/${currentPartner.id}/analytics`}
               className="text-sm font-medium text-blue-600 hover:text-blue-800"
             >
