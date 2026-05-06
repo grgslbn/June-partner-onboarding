@@ -152,14 +152,16 @@ export function SettingsTab({ partner, onSaved }: { partner: Partner; onSaved: (
         <Field label="Flow preset">
           <select {...register('flow_preset')} className={inputCls}>
             <option value="simple">Simple</option>
-            <option value="full">Full</option>
+            <option value="standard">Standard</option>
+            <option value="complete">Complete</option>
           </select>
         </Field>
 
         <Field label="IBAN behavior">
           <select {...register('iban_behavior')} className={inputCls}>
-            <option value="deferred">Deferred</option>
-            <option value="required">Required</option>
+            <option value="in_flow">In flow (collected in form)</option>
+            <option value="deferred">Deferred (via email link)</option>
+            <option value="skip">Skip (not collected)</option>
           </select>
         </Field>
 
