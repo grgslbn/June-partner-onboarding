@@ -1,8 +1,8 @@
 import { createServiceClient } from '@june/db';
 
-export async function sendStripeBackupEmail(
+export async function sendJuneBackupEmail(
   leadId: string,
-  stripeUrl: string,
+  stripeUrl: string | null,
 ): Promise<void> {
   const supabase = createServiceClient();
 
@@ -10,7 +10,7 @@ export async function sendStripeBackupEmail(
     .from('leads')
     .select(
       `id, first_name, last_name, email, locale, confirmation_id, promo_code, created_at,
-       partner:partners(name, june_backup_email, stripe_promo_code),
+       partner:partners(name, june_backup_email),
        shop:shops(name),
        sales_rep:sales_reps(display_name)`,
     )
@@ -18,7 +18,7 @@ export async function sendStripeBackupEmail(
     .single();
 
   if (!lead) {
-    console.error('[send-stripe-backup] lead not found', leadId);
+    console.error('[send-june-backup] lead not found', leadId);
     return;
   }
 
@@ -27,37 +27,36 @@ export async function sendStripeBackupEmail(
   const rep     = Array.isArray(lead.sales_rep) ? lead.sales_rep[0] : lead.sales_rep;
 
   if (!partner?.june_backup_email) {
-    console.error('[send-stripe-backup] june_backup_email missing for lead', leadId);
+    console.warn('[send-june-backup] june_backup_email missing for lead', leadId);
     return;
   }
 
-  const resolvedPromo =
-    (lead.promo_code ?? null) ||
-    (partner.stripe_promo_code ?? null) ||
-    null;
-
   const timestamp = new Date(lead.created_at ?? Date.now()).toISOString();
 
+  const routeLine = stripeUrl
+    ? `Stripe URL: ${stripeUrl}`
+    : 'Route: CS handoff — no Stripe redirect.';
+
   const body = [
-    `[June] Stripe redirect — ${lead.confirmation_id}`,
+    `[June] New lead — ${lead.confirmation_id}`,
     '',
     `Customer:  ${lead.first_name ?? ''} ${lead.last_name ?? ''} <${lead.email ?? ''}>`,
     `Reference: ${lead.confirmation_id ?? ''}`,
     `Partner:   ${partner.name ?? ''}`,
     `Shop:      ${shop?.name ?? '(no shop)'}`,
     `Rep:       ${rep?.display_name ?? '(no rep)'}`,
-    `Promo:     ${resolvedPromo ?? '(none)'}`,
+    `Promo:     ${lead.promo_code ?? '(none)'}`,
     `Locale:    ${lead.locale ?? ''}`,
     '',
-    `Stripe URL: ${stripeUrl}`,
+    routeLine,
     '',
     `Timestamp: ${timestamp}`,
   ].join('\n');
 
-  const subject = `[June] Lead ${lead.confirmation_id} — Stripe redirect for ${lead.first_name ?? ''} ${lead.last_name ?? ''} (${partner.name ?? ''})`;
+  const subject = `[June] Lead ${lead.confirmation_id} — ${lead.first_name ?? ''} ${lead.last_name ?? ''} (${partner.name ?? ''})`;
 
   const { error } = await supabase.from('email_send_queue').insert({
-    email_type:    'stripe_redirect_backup',
+    email_type:    'june_lead_backup',
     to_address:    partner.june_backup_email,
     subject,
     body_text:     body,
@@ -68,6 +67,6 @@ export async function sendStripeBackupEmail(
   });
 
   if (error) {
-    console.error('[send-stripe-backup] queue insert failed', error.message);
+    console.error('[send-june-backup] queue insert failed', error.message);
   }
 }

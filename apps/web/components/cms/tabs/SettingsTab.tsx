@@ -207,6 +207,15 @@ export function SettingsTab({ partner, onSaved }: { partner: Partner; onSaved: (
           ))}
         </fieldset>
 
+        <Field label="June backup email" hint="Receives a notification for every new lead.">
+          <input
+            type="email"
+            placeholder="cs@june.energy"
+            {...register('june_backup_email')}
+            className={inputCls}
+          />
+        </Field>
+
         {isStripeRoute && (
           <div className="space-y-3 rounded-lg bg-gray-50 p-4">
             <Field label="Stripe URL template" hint="The base Stripe checkout URL for this partner.">
@@ -224,15 +233,6 @@ export function SettingsTab({ partner, onSaved }: { partner: Partner; onSaved: (
                 placeholder="SUMMERPROMO"
                 {...register('stripe_promo_code')}
                 className={`${inputCls} font-mono uppercase`}
-              />
-            </Field>
-
-            <Field label="June backup email" hint="Required. Receives a notification for every Stripe redirect with lead details and the Stripe URL.">
-              <input
-                type="email"
-                placeholder="cs@june.energy"
-                {...register('june_backup_email')}
-                className={inputCls}
               />
             </Field>
 
