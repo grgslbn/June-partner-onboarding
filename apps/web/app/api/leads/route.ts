@@ -6,7 +6,7 @@ import { getCachedPartnerBySlug } from '@/lib/partner-cache';
 import { clientIp, rateLimit } from '@/lib/rate-limit';
 import { sendConfirmationEmail } from '@/lib/emails/send-confirmation';
 import { sendSelfOnboardingEmail } from '@/lib/emails/send-self-onboarding';
-import { sendStripeBackupEmail } from '@/lib/emails/send-stripe-backup';
+import { sendJuneBackupEmail } from '@/lib/emails/send-june-backup';
 import { parseFormSchema } from '@/lib/forms/form-schema';
 import { validateFormFields } from '@/lib/forms/validate-submission';
 
@@ -122,24 +122,18 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'preset_not_supported' }, { status: 400 });
   }
 
-  // Pre-flight config check: Stripe routes require both june_backup_email and
-  // stripe_url_template. Fail before inserting the lead so nothing is half-created.
+  // Pre-flight config check: Stripe routes require stripe_url_template.
+  // june_backup_email is important but missing config is non-fatal — log and continue.
   const route = partner.submission_route ?? 'cs_handoff';
-  if (route !== 'cs_handoff') {
-    if (!partner.june_backup_email) {
-      console.error('[leads] june_backup_email not configured', { partnerId: partner.id, route });
-      return NextResponse.json(
-        { error: 'partner_config_error', message: 'june_backup_email not configured for this submission route' },
-        { status: 500 },
-      );
-    }
-    if (!partner.stripe_url_template) {
-      console.error('[leads] stripe_url_template not configured', { partnerId: partner.id, route });
-      return NextResponse.json(
-        { error: 'partner_config_error', message: 'stripe_url_template not configured for this submission route' },
-        { status: 500 },
-      );
-    }
+  if (route !== 'cs_handoff' && !partner.stripe_url_template) {
+    console.error('[leads] stripe_url_template not configured', { partnerId: partner.id, route });
+    return NextResponse.json(
+      { error: 'partner_config_error', message: 'stripe_url_template not configured for this submission route' },
+      { status: 500 },
+    );
+  }
+  if (!partner.june_backup_email) {
+    console.warn('[leads] june_backup_email not configured — backup email will be skipped', { partnerId: partner.id, route });
   }
 
   // Validate configurable fields against partner's form_schema.
@@ -259,6 +253,22 @@ export async function POST(request: Request) {
 
   // ── Route dispatch ────────────────────────────────────────────────────────
 
+  // Build Stripe URL for routes that need it (null for cs_handoff).
+  const stripeUrl =
+    route !== 'cs_handoff'
+      ? buildStripeUrl(
+          partner.stripe_url_template!,
+          lead.email!,
+          promoCode || partner.stripe_promo_code || null,
+          body.locale,
+        )
+      : null;
+
+  // Backup notification fires for every route. Fire-and-forget.
+  sendJuneBackupEmail(lead.id, stripeUrl).catch((err) => {
+    console.error('[leads] sendJuneBackupEmail failed', err);
+  });
+
   if (route === 'cs_handoff') {
     await sendConfirmationEmail(lead.id, partner.id);
     return NextResponse.json(
@@ -267,23 +277,8 @@ export async function POST(request: Request) {
     );
   }
 
-  // Stripe routes: resolve final promo (URL param wins, then partner default)
-  const resolvedPromo = promoCode || partner.stripe_promo_code || null;
-  const stripeUrl = buildStripeUrl(
-    partner.stripe_url_template!,
-    lead.email!,
-    resolvedPromo,
-    body.locale,
-  );
-
-  // Backup notification goes to june_backup_email regardless of which Stripe route.
-  // Fire-and-forget: don't let a backup email failure block the customer response.
-  sendStripeBackupEmail(lead.id, stripeUrl).catch((err) => {
-    console.error('[leads] sendStripeBackupEmail failed', err);
-  });
-
   if (route === 'self_onboarding') {
-    await sendSelfOnboardingEmail(lead.id, stripeUrl);
+    await sendSelfOnboardingEmail(lead.id, stripeUrl!);
     return NextResponse.json(
       { confirmationId: lead.confirmation_id, deferredToken: lead.deferred_token ?? null },
       { status: 200 },
