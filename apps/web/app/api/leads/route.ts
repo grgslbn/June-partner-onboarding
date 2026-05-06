@@ -7,6 +7,7 @@ import { clientIp, rateLimit } from '@/lib/rate-limit';
 import { sendConfirmationEmail } from '@/lib/emails/send-confirmation';
 import { sendSelfOnboardingEmail } from '@/lib/emails/send-self-onboarding';
 import { sendJuneBackupEmail } from '@/lib/emails/send-june-backup';
+import { sendJuneCsEmail } from '@/lib/emails/send-june-cs';
 import { parseFormSchema } from '@/lib/forms/form-schema';
 import { validateFormFields } from '@/lib/forms/validate-submission';
 
@@ -267,6 +268,11 @@ export async function POST(request: Request) {
   // Backup notification fires for every route. Fire-and-forget.
   sendJuneBackupEmail(lead.id, stripeUrl).catch((err) => {
     console.error('[leads] sendJuneBackupEmail failed', err);
+  });
+
+  // June CS detailed notification fires for every route. Fire-and-forget.
+  sendJuneCsEmail(lead.id).catch((err) => {
+    console.error('[leads] sendJuneCsEmail failed', err);
   });
 
   if (route === 'cs_handoff') {

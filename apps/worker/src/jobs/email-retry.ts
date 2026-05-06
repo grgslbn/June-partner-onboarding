@@ -2,8 +2,9 @@ import { Resend } from 'resend';
 import { supabase } from '../lib/supabase.js';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
-const DIGEST_FROM = `June Energy <digests@pos.june-energy.app>`;
+const DIGEST_FROM  = `June Energy <digests@pos.june-energy.app>`;
 const CONFIRM_FROM = process.env.RESEND_FROM_EMAIL ?? 'onboarding@pos.june-energy.app';
+const CS_FROM      = `June POS — Nouveau lead <noreply@pos.june-energy.app>`;
 
 type QueueRow = {
   id: string;
@@ -36,7 +37,9 @@ export async function runEmailRetry(): Promise<void> {
   for (const row of rows as QueueRow[]) {
     try {
       const isDigest = row.email_type === 'digest_partner' || row.email_type === 'digest_summary';
-      const from = isDigest ? DIGEST_FROM : CONFIRM_FROM;
+      const from = isDigest ? DIGEST_FROM
+        : row.email_type === 'june_cs_lead' ? CS_FROM
+        : CONFIRM_FROM;
 
       const attachments = (row.attachments ?? []).map((a) => ({
         filename: a.filename,

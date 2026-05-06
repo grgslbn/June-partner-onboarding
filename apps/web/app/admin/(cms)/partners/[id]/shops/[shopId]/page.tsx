@@ -28,7 +28,7 @@ export default async function ShopEditPage({
   const [partnerRes, shopRes] = await Promise.all([
     supabase
       .from('partners')
-      .select('id, name, slug, logo_url, primary_color, default_locale')
+      .select('id, name, slug, logo_url, primary_color, default_locale, stripe_promo_code')
       .eq('id', partnerId)
       .single(),
     supabase

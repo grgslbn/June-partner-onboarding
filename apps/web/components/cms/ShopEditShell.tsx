@@ -10,7 +10,7 @@ import type { Database } from '@june/db';
 type Shop = Database['public']['Tables']['shops']['Row'];
 type Partner = Pick<
   Database['public']['Tables']['partners']['Row'],
-  'id' | 'name' | 'slug' | 'logo_url' | 'primary_color' | 'default_locale'
+  'id' | 'name' | 'slug' | 'logo_url' | 'primary_color' | 'default_locale' | 'stripe_promo_code'
 >;
 
 type FormValues = {
@@ -19,6 +19,7 @@ type FormValues = {
   city: string;
   zip: string;
   active: boolean;
+  promo_code: string;
 };
 
 type Props = {
@@ -34,15 +35,20 @@ export function ShopEditShell({ shop: initialShop, partner, siteUrl }: Props) {
   const [showDisableConfirm, setShowDisableConfirm] = useState(false);
   const [disabling, setDisabling] = useState(false);
 
-  const { register, handleSubmit: _hs, formState } = useForm<FormValues>({
+  const { register, watch, handleSubmit: _hs, formState } = useForm<FormValues>({
     defaultValues: {
-      name:    shop.name,
-      address: shop.address ?? '',
-      city:    shop.city ?? '',
-      zip:     shop.zip ?? '',
-      active:  shop.active,
+      name:       shop.name,
+      address:    shop.address ?? '',
+      city:       shop.city ?? '',
+      zip:        shop.zip ?? '',
+      active:     shop.active,
+      promo_code: (shop as Shop & { promo_code?: string | null }).promo_code ?? '',
     },
   });
+
+  const promoCodeValue = watch('promo_code');
+  // shop-level promo overrides partner default; omit if both absent
+  const resolvedPromo = promoCodeValue.trim() || partner.stripe_promo_code || null;
 
   const { save } = useAutosave<Shop>({
     resourcePath: `partners/${partner.id}/shops/${shop.id}`,
@@ -156,8 +162,29 @@ export function ShopEditShell({ shop: initialShop, partner, siteUrl }: Props) {
         qrToken={shop.qr_token}
         defaultLocale={partner.default_locale}
         siteUrl={siteUrl}
+        promoCode={resolvedPromo}
         onTokenRegenerated={(newToken) => setShop((s) => ({ ...s, qr_token: newToken }))}
       />
+
+      {/* Promo code override */}
+      <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm space-y-3">
+        <div>
+          <h2 className="text-base font-semibold text-gray-900">Promo code</h2>
+          <p className="mt-1 text-sm text-gray-500">
+            Overrides the partner-level promo code in this shop's QR URL.
+            {partner.stripe_promo_code && !promoCodeValue.trim() && (
+              <span className="ml-1 text-gray-400">(Partner default: <span className="font-mono">{partner.stripe_promo_code}</span>)</span>
+            )}
+          </p>
+        </div>
+        <input
+          type="text"
+          {...register('promo_code')}
+          onBlur={(e) => save({ promo_code: e.target.value.trim() || null })}
+          placeholder={partner.stripe_promo_code ?? 'e.g. IHPOBRAINE'}
+          className={`${inputCls} font-mono uppercase`}
+        />
+      </div>
 
       {/* Disable section */}
       {shop.active && (

@@ -64,7 +64,7 @@ export async function sendConfirmationEmail(
     .from('leads')
     .select(
       `id, first_name, last_name, email, locale, confirmation_id, deferred_token,
-       partner:partners(id, name, logo_url, primary_color, confirmation_email_subject_i18n, confirmation_email_body_i18n),
+       partner:partners(id, name, logo_url, primary_color, iban_behavior, confirmation_email_subject_i18n, confirmation_email_body_i18n),
        shop:shops(name),
        sales_rep:sales_reps(display_name)`,
     )
@@ -126,6 +126,7 @@ export async function sendConfirmationEmail(
       }}
       customBody={body}
       magicLink={magicLink}
+      ibanBehavior={partner.iban_behavior ?? undefined}
       shopName={shop?.name ?? undefined}
       repName={rep?.display_name ?? undefined}
       locale={locale}
