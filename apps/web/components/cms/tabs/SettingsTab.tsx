@@ -166,7 +166,11 @@ export function SettingsTab({ partner, onSaved }: { partner: Partner; onSaved: (
         </Field>
 
         <Field label="Product sold">
-          <input type="text" {...register('product_sold')} className={inputCls} />
+          <select {...register('product_sold')} className={inputCls}>
+            <option value="switch">Switch</option>
+            <option value="switch_plus">Switch Plus</option>
+            <option value="premium">Premium</option>
+          </select>
         </Field>
 
         <Field label="Digest email">
