@@ -176,9 +176,19 @@ export default function DynamicForm({
       </span>
     );
 
-  // Step navigation
+  // Step navigation — only validate fields in the current step to avoid
+  // tcAccepted (on the final step) blocking earlier step transitions.
   async function handleNext() {
-    const valid = await trigger();
+    const fieldsToValidate: string[] =
+      step === 0
+        ? ['firstName', 'lastName', 'email']
+        : currentStepFields.flatMap((f) => {
+            if (f === 'address') return ['address.street', 'address.postal_code', 'address.city'];
+            if (f === 'business') return ['is_business', 'business_name', 'business_vat'];
+            return [f];
+          });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const valid = await trigger(fieldsToValidate as any);
     if (valid) setStep((s) => s + 1);
   }
 
