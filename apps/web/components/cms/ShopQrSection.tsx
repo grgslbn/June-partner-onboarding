@@ -15,6 +15,7 @@ type Props = {
   qrToken: string;
   defaultLocale: string;
   siteUrl: string;
+  promoCode?: string | null;
   onTokenRegenerated: (newToken: string) => void;
 };
 
@@ -44,6 +45,7 @@ export function ShopQrSection({
   qrToken,
   defaultLocale,
   siteUrl,
+  promoCode,
   onTokenRegenerated,
 }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -53,7 +55,9 @@ export function ShopQrSection({
   const [regenError, setRegenError] = useState('');
   const [copied, setCopied] = useState(false);
 
-  const qrUrl = `${siteUrl}/${defaultLocale}/p/${partnerSlug}?shop=${qrToken}`;
+  const qrUrl = promoCode
+    ? `${siteUrl}/${defaultLocale}/p/${partnerSlug}?shop=${qrToken}&promo=${encodeURIComponent(promoCode)}`
+    : `${siteUrl}/${defaultLocale}/p/${partnerSlug}?shop=${qrToken}`;
 
   const renderQr = useCallback(async () => {
     if (!canvasRef.current) return;

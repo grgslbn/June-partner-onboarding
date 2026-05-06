@@ -23,6 +23,7 @@ type FormValues = {
   stripe_url_template: string;
   stripe_promo_code: string;
   june_backup_email: string;
+  june_cs_email: string;
 };
 
 const ROUTE_OPTIONS: { value: SubmissionRoute; label: string; description: string }[] = [
@@ -78,6 +79,7 @@ export function SettingsTab({ partner, onSaved }: { partner: Partner; onSaved: (
       stripe_url_template:  partner.stripe_url_template ?? '',
       stripe_promo_code:    partner.stripe_promo_code ?? '',
       june_backup_email:    partner.june_backup_email ?? '',
+      june_cs_email:        (partner as Partner & { june_cs_email?: string | null }).june_cs_email ?? '',
     },
   });
 
@@ -109,13 +111,14 @@ export function SettingsTab({ partner, onSaved }: { partner: Partner; onSaved: (
       stripe_url_template:  v.stripe_url_template || null,
       stripe_promo_code:    v.stripe_promo_code || null,
       june_backup_email:    v.june_backup_email || null,
+      june_cs_email:        v.june_cs_email || null,
     });
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     v.name, v.slug, v.active, v.content_status, v.default_locale,
     v.flow_preset, v.iban_behavior, v.product_sold, v.savings_sim_enabled,
     v.digest_partner_email, v.submission_route, v.stripe_url_template,
-    v.stripe_promo_code, v.june_backup_email,
+    v.stripe_promo_code, v.june_backup_email, v.june_cs_email,
   ]);
 
   return (
@@ -218,6 +221,15 @@ export function SettingsTab({ partner, onSaved }: { partner: Partner; onSaved: (
             type="email"
             placeholder="cs@june.energy"
             {...register('june_backup_email')}
+            className={inputCls}
+          />
+        </Field>
+
+        <Field label="June CS email" hint="Receives a detailed lead notification for every submission (all routes). Separate from the backup email.">
+          <input
+            type="email"
+            placeholder="tom@june.energy"
+            {...register('june_cs_email')}
             className={inputCls}
           />
         </Field>

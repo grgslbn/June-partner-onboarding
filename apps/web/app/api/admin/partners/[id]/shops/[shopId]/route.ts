@@ -5,7 +5,7 @@ import type { Database } from '@june/db';
 
 type ShopUpdate = Database['public']['Tables']['shops']['Update'];
 
-const ALLOWED_FIELDS = new Set(['name', 'address', 'city', 'zip', 'active']);
+const ALLOWED_FIELDS = new Set(['name', 'address', 'city', 'zip', 'active', 'promo_code']);
 
 export async function GET(
   _request: NextRequest,

@@ -30,6 +30,7 @@ type Props = {
   lead: Lead;
   customBody?: string; // partner-configured Markdown (optional, variable-substituted)
   magicLink?: string;
+  ibanBehavior?: string;
   shopName?: string;
   repName?: string;
   locale: string;
@@ -117,6 +118,7 @@ export function ConfirmationEmail({
   lead,
   customBody,
   magicLink,
+  ibanBehavior,
   locale,
   leadId,
   siteUrl,
@@ -155,8 +157,8 @@ export function ConfirmationEmail({
             </Text>
           </Section>
 
-          {/* Magic link (deferred IBAN) */}
-          {magicLink && (
+          {/* Magic link (deferred IBAN) — hidden when IBAN was already collected in-flow */}
+          {magicLink && ibanBehavior !== 'in_flow' && (
             <Section style={{ ...styles.section, paddingTop: 0 }}>
               <Text style={styles.body2}>{strings.magicLinkNote}</Text>
               <Link href={magicLink} style={{ ...styles.ctaLink, backgroundColor: primary }}>
