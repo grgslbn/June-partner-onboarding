@@ -32,8 +32,8 @@ export default async function UnsubscribePage() {
         </p>
         <p style={{ fontSize: 15, color: '#6b7280', lineHeight: '24px' }}>
           Pour toute question, contactez-nous à{' '}
-          <a href="mailto:info@june.energy" style={{ color: '#1a56db' }}>
-            info@june.energy
+          <a href="mailto:hello@june.energy" style={{ color: '#1a56db' }}>
+            hello@june.energy
           </a>
         </p>
       </div>

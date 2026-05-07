@@ -5,7 +5,7 @@ import { SelfOnboardingEmail } from '@/emails/SelfOnboardingEmail';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 const FROM_EMAIL = process.env.RESEND_FROM_EMAIL ?? 'onboarding@pos.june-energy.app';
-const REPLY_TO = process.env.REPLY_TO_EMAIL ?? 'info@june.energy';
+const REPLY_TO = process.env.REPLY_TO_EMAIL ?? 'hello@june.energy';
 const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL ?? 'https://pos.june-energy.app').replace(/\/$/, '');
 
 const DEV_MODE =
