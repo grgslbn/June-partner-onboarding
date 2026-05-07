@@ -50,7 +50,7 @@ const I18N = {
     address: 'June Energy SA — Bruxelles, Belgique',
     unsubscribe: (partner: string) =>
       `Vous recevez cet email car vous vous êtes inscrit via ${partner}. Si vous n'êtes pas à l'origine de cette demande, merci de nous le signaler à`,
-    unsubscribeLink: 'info@june.energy',
+    unsubscribeLink: 'hello@june.energy',
   },
   nl: {
     preview: (firstName: string, partner: string) =>
@@ -69,7 +69,7 @@ const I18N = {
     address: 'June Energy NV — Brussel, België',
     unsubscribe: (partner: string) =>
       `U ontvangt deze e-mail omdat u zich heeft ingeschreven via ${partner}. Als u deze aanvraag niet heeft gedaan, meld dit dan aan`,
-    unsubscribeLink: 'info@june.energy',
+    unsubscribeLink: 'hello@june.energy',
   },
   en: {
     preview: (firstName: string, partner: string) =>
@@ -88,7 +88,7 @@ const I18N = {
     address: 'June Energy SA — Brussels, Belgium',
     unsubscribe: (partner: string) =>
       `You are receiving this email because you signed up via ${partner}. If you did not initiate this request, please let us know at`,
-    unsubscribeLink: 'info@june.energy',
+    unsubscribeLink: 'hello@june.energy',
   },
 } as const;
 
@@ -165,15 +165,15 @@ export function SelfOnboardingEmail({ partner, lead, stripeUrl, locale, leadId, 
             </Text>
             <Text style={styles.footerText}>
               {strings.contact}{' '}
-              <Link href="mailto:info@june.energy" style={styles.footerLink}>
-                info@june.energy
+              <Link href="mailto:hello@june.energy" style={styles.footerLink}>
+                hello@june.energy
               </Link>
             </Text>
             <Text style={styles.footerText}>{strings.address}</Text>
             <Hr style={{ ...styles.hr, margin: '12px 0' }} />
             <Text style={styles.footerText}>
               {strings.unsubscribe(partner.name)}{' '}
-              <Link href="mailto:info@june.energy" style={styles.footerLink}>
+              <Link href="mailto:hello@june.energy" style={styles.footerLink}>
                 {strings.unsubscribeLink}
               </Link>
               {'. '}

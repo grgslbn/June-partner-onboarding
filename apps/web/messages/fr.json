@@ -8,11 +8,11 @@
       "repPickerPlaceholder": "Choisissez un conseiller",
       "repPickerSelected": "Avec {name}",
       "continueWithoutRep": "Continuer sans conseiller",
-      "noEngagement": "Sans engagement · Résiliable à tout moment"
+      "noEngagement": "Engagement 1 an · Résiliable annuellement"
     },
     "form": {
       "formCardHeading": "Commencer — c'est simple",
-      "formCardSubline": "2 champs suffit. On s'occupe du reste.",
+      "formCardSubline": "Quelques minutes suffisent. On s'occupe du reste.",
       "firstName": "Prénom",
       "lastName": "Nom",
       "email": "Adresse e-mail",
@@ -21,7 +21,7 @@
       "placeholderLastName": "Dupont",
       "placeholderEmail": "marie@exemple.com",
       "tcAccept": "J'accepte les <link>conditions générales</link> et la politique de confidentialité {partnerName} × June.",
-      "submitButton": "Basculer mon contrat gratuitement",
+      "submitButton": "Confirmer mon inscription",
       "submitting": "Envoi en cours…",
       "validation": {
         "required": "Ce champ est requis",
@@ -105,7 +105,7 @@
       "invalidMessage": "Ce lien n'est plus valide. Pour toute question, contactez-nous à",
       "expiredTitle": "Lien expiré",
       "expiredMessage": "Ce lien est valable 30 jours et n'est plus actif. Contactez-nous à",
-      "contactEmail": "info@june.energy",
+      "contactEmail": "hello@june.energy",
       "submitError": {
         "generic": "Une erreur s'est produite. Veuillez réessayer.",
         "network": "Vérifiez votre connexion internet et réessayez.",

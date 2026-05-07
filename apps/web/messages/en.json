@@ -105,7 +105,7 @@
       "invalidMessage": "This link is no longer valid. For any questions, contact us at",
       "expiredTitle": "Link expired",
       "expiredMessage": "This link is valid for 30 days and is no longer active. Please contact us at",
-      "contactEmail": "info@june.energy",
+      "contactEmail": "hello@june.energy",
       "submitError": {
         "generic": "Something went wrong. Please try again.",
         "network": "Check your internet connection and try again.",
