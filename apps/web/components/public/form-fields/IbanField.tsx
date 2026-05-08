@@ -33,8 +33,9 @@ export function IbanField({ setValue, errors, required, labels }: Props) {
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     const raw = e.target.value.replace(/[^a-zA-Z0-9\s]/g, '');
     const formatted = formatIban(raw);
+    const isValid = validateBelgianIban(formatted);
     setDisplay(formatted);
-    setValue('iban', valid ? canonicalIban(formatted) : null, { shouldValidate: true });
+    setValue('iban', isValid ? canonicalIban(formatted) : null, { shouldValidate: true });
   }
 
   return (
