@@ -83,7 +83,7 @@ export default function DynamicForm({
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const form = useForm<any>({
-    resolver: zodResolver(simpleLeadSchema),
+    resolver: zodResolver(simpleLeadSchema.passthrough()),
     mode: 'onChange',
     defaultValues: {
       firstName: '',
