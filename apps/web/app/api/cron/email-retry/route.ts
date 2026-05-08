@@ -63,7 +63,7 @@ export async function GET(request: Request) {
         from,
         to:      row.to_address,
         subject: row.subject,
-        html:    row.body_html ?? undefined,
+        html:    row.body_html ?? '',
         text:    row.body_text ?? undefined,
         ...(attachments.length > 0 ? { attachments } : {}),
       });
